@@ -7,6 +7,8 @@ import Customer from '../pages/Customer'
 import Employees from '../pages/Employees'
 import Vehicles from '../pages/Vehicles'
 import VehicleBrand from '../pages/VehicleBrand'
+import Product from '../pages/Product'
+import Security from '../pages/Security'
 
 const ProtectedRoute = ({ children }) => {
 
@@ -50,6 +52,12 @@ const router = createBrowserRouter([
             },
             {
                 path: '/vehiclebrand' , element: <VehicleBrand/>
+            },
+            {
+                path: '/product' , element: <Product/>
+            },
+            {
+                path: '/security' , element: <Security/>
             }
         ]
     },

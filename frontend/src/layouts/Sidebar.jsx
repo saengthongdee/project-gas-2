@@ -15,7 +15,8 @@ import {
   ClipboardList,
   ChevronDown,
   Bike,
-  Bus
+  Bus,
+  Lock
 } from "lucide-react";
 
 const menuSections = [
@@ -30,7 +31,7 @@ const menuSections = [
     category: "จัดการคลังแก๊ส",
     collapsible: false,
     items: [
-      { title: "จัดการสินค้า", path: "/cylinders/deposit", icon: Package },
+      { title: "จัดการสินค้า", path: "/product", icon: Package },
     ],
   },
   {
@@ -69,6 +70,13 @@ const menuSections = [
       { title: "รายการยานพาหนะ", path: "/vehiclebrand", icon: Bus },
     ],
   },
+  {
+  category: "ความปลอดภัย",
+  collapsible: false,
+  items: [
+    { title: "จัดการรหัสผ่าน", path: "/security", icon: Lock },
+  ],
+}
 ];
 
 export default function Sidebar() {
@@ -138,7 +146,7 @@ export default function Sidebar() {
                       to={item.path}
                       end={item.exact}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-6 py-2.5 rounded-[5px] text-sm font-medium transition-all ${
+                        `flex items-center gap-3 px-6 py-2.5 rounded-[5px] text-[13px] font-medium transition-all ${
                           isActive
                             ? "bg-neutral-200 text-[#1A1A1A]"
                             : "hover:bg-neutral-200 text-[#1A1A1A]"

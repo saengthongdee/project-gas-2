@@ -1,5 +1,6 @@
 const employeeModel =require('../models/employeeModel');
 const ApiError =require('../utils/ApiError');
+const bcrypt = require('bcryptjs')
 
 const findAllEmployee =async()=>{
     return new Promise ((success,fail)=>{
@@ -54,9 +55,35 @@ const deleteEmployee = async(employee_id)=>{
         })
     })
 }
+
+const ChangPassword = async (newPassword, employee_id) => {
+    try {
+        const hashpassword = await bcrypt.hash(newPassword, 10);
+
+        return new Promise((success, fail) => {
+            employeeModel.ChangPassword(employee_id,hashpassword, (err, result) => {
+                if (err) {
+                    return fail(err);
+                }
+                console.log("emp_id :" , employee_id)
+
+                console.log("MySQL Result:", result);
+
+                success({
+                    success: true,
+                    message: "Password changed successfully"
+                });
+            });
+        });
+    } catch (err) {
+        throw err;
+    }
+};
+
 module.exports={
     findAllEmployee,
     createEmployee,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
+    ChangPassword
 }

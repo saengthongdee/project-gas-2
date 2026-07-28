@@ -17,6 +17,10 @@ const login =async (email,password )=>{
             }
             const user =results[0];
 
+            if(user.password === undefined || user.password === null) {
+                return fail(new ApiError(400, "กรุณาติดต่อเจ้าของร้าน"))
+            }
+
             if(!user) {
                 return fail(new ApiError(401,'User not found'))
             }

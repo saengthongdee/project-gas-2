@@ -88,7 +88,7 @@ export default function Employees() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 overflow-hidden  ">
+    <div className="max-w-7xl mx-auto  p-6 space-y-6 overflow-hidden max-h-screen ">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

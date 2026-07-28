@@ -30,9 +30,17 @@ const deleteEmployee =async(employee_id,callback)=>{
     db.query(sql,[employee_id],callback);
 }
 
+const ChangPassword = async(employee_id , newPassword , callback) => {
+
+    const sql = "update employees set password = ? where employee_id = ?";
+
+    db.query(sql , [newPassword , employee_id] , callback)
+}
+
 module.exports={
     findAllEmployee,
     createEmployee,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
+    ChangPassword
 }

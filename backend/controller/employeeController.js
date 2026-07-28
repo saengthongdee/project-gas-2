@@ -33,3 +33,16 @@ exports.deleteEmployee = asyncHandler(async(req,res,next)=>{
     const result=await employeeService.deleteEmployee(id);
     res.status(200).json(result);
 })
+
+exports.ChangPassword = asyncHandler(async(req , res, next) => {
+
+    const id = req.params.id
+    const password = req.body.password
+
+    if(!id || !password) {
+        return next(new ApiError(400, "id or password are required"))
+    }
+    const result = await employeeService.ChangPassword(password , id)
+
+    res.status(200).json(result)
+})
