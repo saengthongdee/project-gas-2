@@ -88,10 +88,26 @@ const deleteOrder = async(order_id) => {
         })
     })
 }
+const findOrderbyStatus = async()=>{
+    
+    return new Promise((success, fail) => {
 
+        orderModel.findOrderbyStatus((err,results) => {
+
+            if(err) { return fail(err)}
+
+            success({
+                success:true,
+                message:"Fetch order by status successfully",
+                data:results
+            })
+        })
+    })
+}
 
 module.exports={
     createOrder,
     getAllOrder,
-    deleteOrder
+    deleteOrder,
+    findOrderbyStatus
 }

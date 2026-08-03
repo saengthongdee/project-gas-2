@@ -42,7 +42,7 @@ const menuSections = [
   {
     category: "การจัดส่ง",
     collapsible: false,
-    items: [{ title: "รายการการจัดส่ง", path: "/deliveries", icon: Truck }],
+    items: [{ title: "รายการการจัดส่ง", path: "/delivery", icon: Truck }],
   },
   {
     category: "บิล / การค้างถัง",

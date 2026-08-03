@@ -2,7 +2,9 @@ const db=require('../configs/db');
 
 
 const findAllVehicle = async(callback)=>{
-    const sql="SELECT * FROM vehicles"
+    const sql=`SELECT * FROM vehicles v
+	join vehicle_brands vb
+		on v.brand_id = vb.brand_id`
     db.query(sql,callback);
 }
 const createVehicle = async(vehicledata,callback)=>{

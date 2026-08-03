@@ -9,10 +9,10 @@ export default function DeliverySlideOver({
   setSelectedOrderIds,
   onSuccess,
 }) {
-  // ดึงข้อมูลรถจาก Hook ภายใน SlideOver
+  // ❌ อย่าใส่ if (!isOpen) return null; ตรงนี้นะครับ
+
   const { loading: vehiclesLoading, data: vehicleResponse, vehicles: vehicleList } = useVehicles() || {};
   
-  // รองรับการอ่านค่าทั้งจาก response.data หรือ array โดยตรง
   const vehicles = Array.isArray(vehicleResponse) 
     ? vehicleResponse 
     : vehicleResponse?.data || vehicleList || [];
@@ -20,7 +20,6 @@ export default function DeliverySlideOver({
   const [selectedVehicleId, setSelectedVehicleId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // กดยืนยันจัดคิวส่งสินค้า
   const handleConfirmQueue = async () => {
     if (!selectedVehicleId) return;
 
@@ -34,7 +33,6 @@ export default function DeliverySlideOver({
 
       console.log("Submitting Queue Delivery Payload:", payload);
 
-      // Reset ค่าและแจ้ง Parent Component
       setSelectedOrderIds([]);
       setSelectedVehicleId('');
       onClose();
@@ -134,7 +132,6 @@ export default function DeliverySlideOver({
                     </div>
                   </div>
 
-                  {/* Status Indicator */}
                   <div>
                     {!isAvailable ? (
                       <span className="text-xs font-medium text-rose-500 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">

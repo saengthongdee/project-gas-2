@@ -19,7 +19,10 @@ exports.findAllOrders=asyncHandler(async(req,res,next)=>{
     const results = await orderService.getAllOrder()
     res.status(200).json(results)
 })
-
+exports.findOrderbyStatus = asyncHandler(async(req,res,next)=>{
+    const results = await orderService.findOrderbyStatus()
+    res.status(200).json(results)
+})
 exports.deleteOrders = asyncHandler(async (req , res , next) => {
 
     const id = req.params.id

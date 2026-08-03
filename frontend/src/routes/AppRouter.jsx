@@ -10,6 +10,7 @@ import VehicleBrand from '../features/vehiclebrand/page/VehicleBrand'
 import Product from '../features/product/page/Product'
 import Security from '../features/security/page/Security'
 import Order from '../features/order/page/Order'
+import Delivery from '../features/delivery/page/Delivery'
 
 const ProtectedRoute = ({ children }) => {
 
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
             },
             {
                 path: '/order' , element: <Order/>
+            }
+            ,
+            {
+                path: '/delivery' , element: <Delivery/>
             }
         ]
     },

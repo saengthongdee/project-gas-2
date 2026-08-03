@@ -35,6 +35,12 @@ const delivery_status = (order_id,callback)=>{
     db.query(sql,order_id,callback)
 }
 
+const findOrderbyStatus = (callback)=>{
+
+    const sql ="select order_id , order_date ,total_amount ,delivery_status from orders where delivery_status = 'pending' order by order_date desc;"
+    db.query(sql,callback)
+}
+
 module.exports={
     createOrder,
     updateOrder_Decrement,
@@ -42,5 +48,6 @@ module.exports={
     findAllOrder,
     updatetotal_amount,
     deleteOrder,
-    delivery_status
+    delivery_status,
+    findOrderbyStatus
 }
