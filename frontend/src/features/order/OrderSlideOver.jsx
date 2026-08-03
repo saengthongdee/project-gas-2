@@ -3,7 +3,7 @@ import { X, Loader2, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { useCustomer } from "../customers/hooks/useCustomer";
 import { useProduct } from "../product/hook/useProduct";
 
-export default function OrderSlideOver({ isOpen, onClose, onSave, initialData }) {
+export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , onDelete }) {
   const { data: customers = [] } = useCustomer();
   const { data: products = [] } = useProduct();
 
@@ -106,14 +106,20 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData })
 
   // ลบรายการ order
   const removeItemRow = (index) => {
+
+    if(!index){ return}
+
     if (formData.items.length === 1) return;
     setFormData((prev) => ({
       ...prev,
       items: prev.items.filter((_, i) => i !== index),
     }));
+
+    onDelete(formData.items[index].item_id)
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
 
     const payload = {

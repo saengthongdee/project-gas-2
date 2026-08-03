@@ -99,6 +99,22 @@ export const useOrder = () => {
         throw err;
     }
   }
+  
+  const deleteOrderItem = async (itemId) => {
+
+    try{
+
+      setError(null)
+
+      const response = await axiosInstance.delete(`/order_item/${itemId}`)
+
+      return response.data;
+
+    }catch(err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    }
+  }
 
    useEffect(() => {
     fetchingData();
@@ -111,6 +127,7 @@ export const useOrder = () => {
     refetch: fetchingData,
     createOrder,
     updateOrderItems,
-    deleteOrder
+    deleteOrder,
+    deleteOrderItem
   };
 };

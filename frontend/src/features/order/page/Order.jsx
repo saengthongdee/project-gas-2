@@ -21,16 +21,20 @@ import {
 } from "lucide-react";
 
 export default function Order() {
-  const { data: orders = [], loading, error, createOrder, updateOrderItems , refetch , deleteOrder } = useOrder();
+  const { data: orders = [], loading, error, createOrder, updateOrderItems , refetch , deleteOrder , deleteOrderItem } = useOrder();
 
   // State สำหรับ SlideOver & Modal Mode (เพิ่ม/ดูรายละเอียดออเดอร์)
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectItemId, setSelectItemId] = useState(null);
 
   // State สำหรับ Search & Filter
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSaveOrder = async (payload) => {
+
+    console.log("Payload to save:", payload);
+    
     try {
 
       if (selectedOrder) {
@@ -90,6 +94,23 @@ export default function Order() {
       }
     }
   };
+
+  const handleDeleteOrderItem = async (itemId) => {
+
+    if(!itemId) {return}
+
+    if(window.confirm(`คุณต้องการลบรายการสินค้า ID: ${itemId} ใช่หรือไม่?`)) {
+       try{
+
+        await deleteOrderItem(itemId)
+        await refetch();
+        toast.success(`ลบรายการสินค้า #${itemId} สำเร็จ`);
+       }catch(err){
+        console.error(err);
+        toast.error("ไม่สามารถลบรายการสินค้าได้");
+       }
+    }
+  }
 
 
   return (
@@ -275,6 +296,7 @@ export default function Order() {
         onClose={() => setIsSlideOverOpen(false)}
         initialData={selectedOrder}
         onSave={handleSaveOrder}
+        onDelete={handleDeleteOrderItem}
       />
 
     </div>

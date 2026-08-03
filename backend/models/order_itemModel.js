@@ -17,8 +17,6 @@ const Createitem_order = (order_id , itemData , callback) => {
     const sql  = `INSERT INTO order_items
         (order_id , product_id , quantity , unit_price)
         values ?`
-        
-    
 
     db.query(sql , [values] , callback)
 }
@@ -51,6 +49,7 @@ const findAllbyOrder_id = (order_id,callback)=>{
     const sql="select * from order_items where order_id = ?"
     db.query(sql,order_id,callback)
 }
+
 
 module.exports = {
     Createitem_order,
