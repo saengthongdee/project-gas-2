@@ -37,7 +37,7 @@ const menuSections = [
   {
     category: "ออเดอร์",
     collapsible: false,
-    items: [{ title: "ออเดอร์", path: "/report", icon: BarChart3 }],
+    items: [{ title: "ออเดอร์", path: "/order", icon: BarChart3 }],
   },
   {
     category: "การจัดส่ง",

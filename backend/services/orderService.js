@@ -31,6 +31,7 @@ const createOrder = async(orderdata)=>{
 const getAllOrder = async()=>{
     return new Promise((success,fail)=>{
         const fetchOrder = new Promise ((resolve,reject)=>{
+
             orderModel.findAllOrder((err,results)=>{
                 if(err){return fail(err)}
                 resolve(results)
@@ -55,8 +56,7 @@ const getAllOrder = async()=>{
                         order_id : order.order_id,
                         customer_name:order.customer_name,
                         total_amount:order.total_amount,
-                        employee_name:order.name,
-                        license_palte: order.license_palte,
+                        delivery_status:order.delivery_status,
                         items: matchingItems
                     }
             })
@@ -72,9 +72,25 @@ const getAllOrder = async()=>{
     })
 }
 
+const deleteOrder = async(order_id) => {
+
+    return new Promise((success , fail ) => {
+
+        orderModel.deleteOrder(order_id , (err , results) => {
+
+            if(err) { return fail(err)}
+
+            success({
+                success:true,
+                message:"Delete order successfully"
+            })
+        })
+    })
+}
+
 
 module.exports={
     createOrder,
-    getAllOrder
-
+    getAllOrder,
+    deleteOrder
 }

@@ -19,3 +19,13 @@ exports.findAllOrders=asyncHandler(async(req,res,next)=>{
     const results = await orderService.getAllOrder()
     res.status(200).json(results)
 })
+
+exports.deleteOrders = asyncHandler(async (req , res , next) => {
+
+    const id = req.params.id
+    
+    if(!id) { return new ApiError(400,"Missing required field: id") }
+
+    const result = await orderService.deleteOrder(id)
+    res.status(200).json(result)
+})
