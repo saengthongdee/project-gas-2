@@ -1,14 +1,15 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import MainLayout from '../layouts/MainLayout'
-import Login from '../pages/Login'
-import Dashboard from '../pages/Dashboard'
-import Customer from '../pages/Customer'
-import Employees from '../pages/Employees'
-import Vehicles from '../pages/Vehicles'
-import VehicleBrand from '../pages/VehicleBrand'
-import Product from '../pages/Product'
-import Security from '../pages/Security'
+import Login from '../features/login/page/Login'
+import Dashboard from '../features/dashboard/page/Dashboard'
+import Customer from '../features/customers/page/Customer'
+import Employees from '../features/employee/page/Employees'
+import Vehicles from '../features/vehicle/page/Vehicle'
+import VehicleBrand from '../features/vehiclebrand/page/VehicleBrand'
+import Product from '../features/product/page/Product'
+import Security from '../features/security/page/Security'
+import Order from '../features/order/page/Order'
 
 const ProtectedRoute = ({ children }) => {
 
@@ -58,6 +59,9 @@ const router = createBrowserRouter([
             },
             {
                 path: '/security' , element: <Security/>
+            },
+            {
+                path: '/order' , element: <Order/>
             }
         ]
     },

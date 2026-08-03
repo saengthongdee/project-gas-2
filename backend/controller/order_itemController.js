@@ -3,13 +3,14 @@ const asyncHandler = require('../utils/asyncHandler')
 const ApiError =require('../utils/ApiError')
 
 exports.updateOrder_item = asyncHandler(async(req,res,next)=>{
-    const {quantity}=req.body;
-    const item_id=req.params.id;
 
-    if(!quantity || quantity === 0 || !item_id || quantity <=0){
-        return next(new ApiError(400,"quantity or item_id are required"))
+    const order_id = req.params.id;
+    const { items } = req.body;
+
+    if (!order_id || !items || !Array.isArray(items) || items.length === 0) {
+        return next(new ApiError(400, "order_id and items array are required"));
     }
-    const result =await order_itemService.update_itemOrder(item_id,quantity)
+    const result =await order_itemService.updateMultipleItemOrders(order_id, items)
     res.status(200).json(result)
 })
 
