@@ -34,7 +34,7 @@ export default function Order() {
   const handleSaveOrder = async (payload) => {
 
     console.log("Payload to save:", payload);
-    
+
     try {
 
       if (selectedOrder) {
@@ -222,6 +222,7 @@ export default function Order() {
                   <th className="py-3.5 px-4">ชื่อลูกค้า</th>
                   <th className="py-3.5 px-4 text-center">จำนวนรายการสินค้า</th>
                   <th className="py-3.5 px-4 text-right">ยอดรวมทั้งหมด (บาท)</th>
+                  <th className="py-3.5 px-4 text-right">วันที่สั่งซื้อ</th>
                   <th className="py-3.5 px-4 text-center">สถานะการจัดส่ง</th>
                   <th className="py-3.5 px-4 text-center">จัดการ</th>
                 </tr>
@@ -253,6 +254,14 @@ export default function Order() {
 
                       <td className="py-3.5 px-4 text-right font-bold text-sky-700">
                         {Number(order.total_amount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right text-gray-600">
+                        {new Date(order.order_date).toLocaleDateString('th-TH', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })}
                       </td>
 
                       <td className="py-3.5 px-4 text-center">

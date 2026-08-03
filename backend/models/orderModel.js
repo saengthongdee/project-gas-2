@@ -15,9 +15,9 @@ const updateOrder_Increment = (order_id,total_amount,callback)=>{
 }
 
 const findAllOrder =(callback)=>{
-    const sql=`select o.order_id , c.customer_name ,o.total_amount , o.delivery_status from orders o
+    const sql=`select o.order_id , c.customer_name ,o.total_amount , o.delivery_status , o.order_date from orders o
 	join customers c 
-		on o.customer_id = c.customer_id;`
+		on o.customer_id = c.customer_id order by o.order_date desc;`
                     db.query(sql,callback)
 }
 const updatetotal_amount=(order_id,amount,callback)=>{

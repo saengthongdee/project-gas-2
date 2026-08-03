@@ -57,6 +57,7 @@ const getAllOrder = async()=>{
                         customer_name:order.customer_name,
                         total_amount:order.total_amount,
                         delivery_status:order.delivery_status,
+                        order_date:order.order_date,
                         items: matchingItems
                     }
             })
