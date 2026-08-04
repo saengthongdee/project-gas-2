@@ -37,8 +37,28 @@ const delivery_status = (order_id,callback)=>{
 
 const findOrderbyStatus = (callback)=>{
 
-    const sql ="select order_id , order_date ,total_amount ,delivery_status from orders where delivery_status = 'pending' order by order_date desc;"
+    const sql =
+    `
+    select o.order_id ,c.address,o.order_date ,o.total_amount ,o.delivery_status from 
+	orders o 
+		join customers c
+			on o.customer_id = c.customer_id
+	order by o.order_date desc
+    `
     db.query(sql,callback)
+}
+
+const updateOrderVehicle = (order_id,vehicle_id,callback) => {
+
+    const sql = "update orders set vehicle_id = ? where order_id in (?)"
+
+    db.query(sql,[vehicle_id,order_id],callback)
+}
+
+const updateOrderStatus = (order_ids, status, callback) => {
+
+    const sql = "update orders set delivery_status = ? where order_id in (?)"
+    db.query(sql, [status, order_ids], callback);
 }
 
 module.exports={
@@ -49,5 +69,7 @@ module.exports={
     updatetotal_amount,
     deleteOrder,
     delivery_status,
-    findOrderbyStatus
+    findOrderbyStatus,
+    updateOrderVehicle,
+    updateOrderStatus
 }

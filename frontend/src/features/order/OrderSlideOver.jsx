@@ -179,7 +179,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between min-h-0">
-          <div className="p-6 space-y-4 overflow-y-auto">
+          <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
                 {error}
@@ -188,7 +188,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
 
             {/* เลือกลูกค้า */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
+              <label className="block text-sm font-medium text-[#4b4a4a] mb-1">
                 ลูกค้า <span className="text-red-500">*</span>
               </label>
               <select
@@ -196,7 +196,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
                 required
                 value={formData.customer_id}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A] cursor-pointer"
+                className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] cursor-pointer"
               >
                 <option value="">-- เลือกลูกค้า --</option>
                 {customers.map((c) => (
@@ -210,7 +210,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
             {/* รายการสินค้า (Items Dynamic List) */}
             <div className="pt-2">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-[#1A1A1A]">
+                <label className="text-sm font-medium text-[#4b4a4a]">
                   รายการสินค้า <span className="text-red-500">*</span>
                 </label>
                 <button
@@ -236,7 +236,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
                             handleItemChange(index, "product_id", e.target.value)
                           }
                           required
-                          className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A] cursor-pointer"
+                          className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] cursor-pointer"
                         >
                           <option value="">-- เลือกสินค้า --</option>
                           {products.map((p) => (
@@ -272,7 +272,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
                             handleItemChange(index, "quantity", e.target.value)
                           }
                           required
-                          className="w-full px-3 py-1.5 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]"
+                          className="w-full px-3 py-1.5 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
                         />
                       </div>
                       <div>
@@ -312,14 +312,14 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="w-1/2 px-4 py-3 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
+                className="w-1/2 px-4 py-3 text-sm font-medium text-neutral-700 bg-white hover:bg-gray-200 border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
               >
                 ยกเลิก
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-1/2 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white hover:bg-[#009966] bg-[#006600] rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                className="w-1/2 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white btn-primary rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>{initialData ? "บันทึกการแก้ไข" : "บันทึกข้อมูล"}</span>

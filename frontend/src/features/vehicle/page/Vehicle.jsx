@@ -1,8 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useVehicles } from "../hook/useVehicle";
 import { useVehicleBrands } from "../../vehiclebrand/hook/useVehicleBrand";
 import VehicleSlideOver from "../VehicleSlideOver";
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Truck } from "lucide-react";
+import { 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  Loader2, 
+  AlertCircle, 
+  Truck, 
+  CheckCircle2, 
+  Clock, 
+  Wrench 
+} from "lucide-react";
 
 export default function Vehicles() {
   const { vehicles, loading, error, addVehicle, updateVehicle, deleteVehicle } = useVehicles();
@@ -11,6 +21,16 @@ export default function Vehicles() {
   const [actionLoading, setActionLoading] = useState(null);
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+  // คำนวณจำนวนสถิติรถแยกตามสถานะ
+  const stats = useMemo(() => {
+    const total = vehicles.length;
+    const available = vehicles.filter((v) => v.status === "available").length;
+    const inUse = vehicles.filter((v) => v.status === "in_use").length;
+    const maintenance = vehicles.filter((v) => v.status === "maintenance").length;
+
+    return { total, available, inUse, maintenance };
+  }, [vehicles]);
 
   const getBrandName = (brandId) => {
     const brand = brands.find((b) => b.brand_id === brandId);
@@ -79,23 +99,90 @@ export default function Vehicles() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A]">ยานพาหนะจัดส่งแก๊ส</h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold text-[#1A1A1A]">ข้อมูลยานพาหนะ</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600 border border-neutral-200/60">
+              {stats.total} คัน
+            </span>
+          </div>
           <p className="text-sm text-neutral-500 mt-1">
-            จัดการทะเบียนรถ น้ำหนักบรรทุกสูงสุด และสถานะการทำงาน
+            จัดการข้อมูลรายการรถ น้ำหนักบรรทุกสูงสุด และติดตามสถานะการทำงาน
           </p>
         </div>
+
         <button
           type="button"
           onClick={handleOpenAdd}
-          className="flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-neutral-800 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+          className="flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-neutral-800 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>เพิ่มรถใหม่</span>
         </button>
       </div>
 
+      {/* Stat Cards (กล่องสรุปสถิติ) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* จำนวนรถทั้งหมด */}
+        <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-700 shrink-0">
+            <Truck className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-neutral-500">จำนวนรถทั้งหมด</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-2xl font-bold text-[#1A1A1A]">{stats.total}</span>
+              <span className="text-xs text-neutral-500">คัน</span>
+            </div>
+          </div>
+        </div>
+
+        {/* พร้อมใช้งาน */}
+        <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-neutral-500">พร้อมใช้งาน</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-2xl font-bold text-[#1A1A1A]">{stats.available}</span>
+              <span className="text-xs text-neutral-500">คัน</span>
+            </div>
+          </div>
+        </div>
+
+        {/* กำลังส่งของ */}
+        <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-neutral-500">กำลังส่งของ</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-2xl font-bold text-[#1A1A1A]">{stats.inUse}</span>
+              <span className="text-xs text-neutral-500">คัน</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ซ่อมบำรุง */}
+        <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 shrink-0">
+            <Wrench className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-neutral-500">ซ่อมบำรุง</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-2xl font-bold text-[#1A1A1A]">{stats.maintenance}</span>
+              <span className="text-xs text-neutral-500">คัน</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Alert Error */}
       {error && (
         <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           <AlertCircle className="w-5 h-5 shrink-0" />
@@ -103,6 +190,7 @@ export default function Vehicles() {
         </div>
       )}
 
+      {/* Table Section */}
       <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
         {loading && vehicles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-neutral-400 gap-2">
@@ -143,7 +231,7 @@ export default function Vehicles() {
                       <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleOpenEdit(v)}
-                          className="p-1.5 text-neutral-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                          className="p-1.5 text-neutral-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors cursor-pointer"
                           title="แก้ไข"
                         >
                           <Pencil className="w-4 h-4" />
@@ -151,7 +239,7 @@ export default function Vehicles() {
                         <button
                           onClick={() => handleDelete(v.vehicle_id, v.license_plate)}
                           disabled={actionLoading === v.vehicle_id}
-                          className="p-1.5 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                          className="p-1.5 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50 cursor-pointer"
                           title="ลบ"
                         >
                           {actionLoading === v.vehicle_id ? (
@@ -170,6 +258,7 @@ export default function Vehicles() {
         )}
       </div>
 
+      {/* SlideOver Drawer */}
       <VehicleSlideOver
         isOpen={isSlideOverOpen}
         onClose={() => setIsSlideOverOpen(false)}

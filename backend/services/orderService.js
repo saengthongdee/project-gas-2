@@ -1,4 +1,5 @@
 const orderModel = require('../models/orderModel')
+const vihicleModel = require('../models/vehicleModel')
 const items_order = require('../models/order_itemModel')
 
 const ApiError =require('../utils/ApiError')
@@ -105,9 +106,36 @@ const findOrderbyStatus = async()=>{
     })
 }
 
+const updateOrderVehicle = async(order_id,vehicle_id) => {
+
+    return new Promise((success , fail ) => {
+
+        orderModel.updateOrderVehicle(order_id , vehicle_id , (err , results) => {
+
+            if(err) {return fail(err)}
+
+            orderModel.updateOrderStatus(order_id, 'delivering', (err, results) => {
+
+                if(err) {return fail(err)}
+
+                vihicleModel.updateVehicleStatus(vehicle_id, 'in_use', (err, results) => {
+
+                    if(err) {return fail(err)}
+
+                    success({
+                        success:true,
+                        message:"Update order vehicle successfully"
+                    })
+                })
+            })
+        })
+    })
+}
+
 module.exports={
     createOrder,
     getAllOrder,
     deleteOrder,
-    findOrderbyStatus
+    findOrderbyStatus,
+    updateOrderVehicle
 }

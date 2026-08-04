@@ -1,185 +1,221 @@
-import React, { useState } from 'react';
-import { useVehicles } from "../vehicle/hook/useVehicle";
-import { Truck, Loader2, X, Check } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Truck, Loader2, Save, X as CloseIcon } from "lucide-react";
+import { useVehicleBrands } from "../vehiclebrand/hook/useVehicleBrand";
 
-export default function DeliverySlideOver({
-  isOpen,
-  onClose,
-  selectedOrderIds,
-  setSelectedOrderIds,
-  onSuccess,
-}) {
-  // ดึงข้อมูลรถจาก Hook ภายใน SlideOver
-  const { loading: vehiclesLoading, data: vehicleResponse, vehicles: vehicleList } = useVehicles() || {};
-  
-  // รองรับการอ่านค่าทั้งจาก response.data หรือ array โดยตรง
-  const vehicles = Array.isArray(vehicleResponse) 
-    ? vehicleResponse 
-    : vehicleResponse?.data || vehicleList || [];
+const INITIAL_FORM = {
+  license_plate: "",
+  brand_id: "",
+  capacity_kg: "",
+  status: "available", // Default เป็น available เสมอ
+};
 
-  const [selectedVehicleId, setSelectedVehicleId] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData }) {
+  const { brands, loading: loadingBrands } = useVehicleBrands();
 
-  // กดยืนยันจัดคิวส่งสินค้า
-  const handleConfirmQueue = async () => {
-    if (!selectedVehicleId) return;
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // อัปเดตข้อมูล Form เมื่อเปิด Modal หรือเปลี่ยน initialData
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        license_plate: initialData.license_plate || "",
+        brand_id: initialData.brand_id || "",
+        capacity_kg: initialData.capacity_kg || "",
+        status: initialData.status || "available",
+      });
+    } else {
+      setFormData(INITIAL_FORM);
+    }
+    setErrorMessage("");
+  }, [initialData, isOpen]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.license_plate.trim()) {
+      setErrorMessage("กรุณากรอกทะเบียนรถ");
+      return;
+    }
+    if (!formData.brand_id) {
+      setErrorMessage("กรุณาเลือกยี่ห้อ/ประเภทรถ");
+      return;
+    }
 
     try {
-      setIsSubmitting(true);
+      setSubmitting(true);
+      setErrorMessage("");
 
       const payload = {
-        vehicle_id: selectedVehicleId,
-        order_ids: selectedOrderIds,
+        ...formData,
+        brand_id: Number(formData.brand_id),
+        capacity_kg: formData.capacity_kg ? Number(formData.capacity_kg) : 0,
       };
 
-      console.log("Submitting Queue Delivery Payload:", payload);
-
-      // Reset ค่าและแจ้ง Parent Component
-      setSelectedOrderIds([]);
-      setSelectedVehicleId('');
+      await onSave(payload);
       onClose();
-
-      if (typeof onSuccess === 'function') {
-        onSuccess();
-      }
     } catch (err) {
-      console.error("Failed to assign queue:", err);
+      console.error("Failed to save vehicle:", err);
+      setErrorMessage(
+        err.response?.data?.message || err.message || "เกิดข้อผิดพลาดในการบันทึก"
+      );
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <>
-      {/* Backdrop */}
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden transition-all duration-300 ${
+        isOpen
+          ? "pointer-events-auto visible"
+          : "pointer-events-none invisible delay-300"
+      }`}
+    >
+      {/* Backdrop (Fade In / Out) */}
       <div
-        className={`fixed inset-0 bg-black/40 z-40 h-screen transition-opacity duration-300 ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 bg-black/40  transition-opacity duration-300 ease-in-out ${
+          isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}
       />
 
-      {/* Drawer Panel */}
+      {/* Slide-over Panel (Slide Right In / Out) */}
       <div
-        className={`fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed inset-y-0 right-0 flex max-w-full pl-10 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
-          <div>
-            <h2 className="text-lg font-bold text-[#1A1A1A]">เลือกรถสำหรับจัดส่งสินค้า</h2>
-            <p className="text-xs text-neutral-500 mt-0.5">
-              รายการออเดอร์ที่เลือกไว้: <span className="font-semibold text-blue-600">{selectedOrderIds.length} รายการ</span>
-            </p>
+        <div className="w-screen max-w-md bg-white shadow-xl flex flex-col justify-between">
+          {/* Header */}
+          <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-white">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-neutral-100 rounded-lg text-[#1A1A1A]">
+                <Truck className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-[#1A1A1A]">
+                  {initialData ? "แก้ไขข้อมูลรถ" : "เพิ่มรถใหม่"}
+                </h2>
+                <p className="text-xs text-neutral-500">
+                  {initialData
+                    ? "อัปเดตรายละเอียดรถ"
+                    : "ลงทะเบียนยานพาหนะเข้าสู่ระบบ"}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"
+            >
+              <CloseIcon className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+
+          {/* Form Body */}
+          <form
+            id="vehicle-form"
+            onSubmit={handleSubmit}
+            className="p-6 space-y-5 overflow-y-auto flex-1"
           >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+            {errorMessage && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-lg text-xs font-medium">
+                {errorMessage}
+              </div>
+            )}
 
-        {/* Body */}
-        <div className="flex-1 p-6 space-y-3 overflow-y-auto min-h-0">
-          <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider block mb-2">
-            พาหนะที่พร้อมใช้งาน ({vehicles.filter(v => v.status === 'available').length})
-          </label>
-
-          {vehiclesLoading ? (
-            <div className="p-12 text-center text-neutral-400 text-sm flex items-center justify-center gap-2">
-              <Loader2 className="w-5 h-5 animate-spin" /> กำลังโหลดข้อมูลรถจัดส่ง...
+            {/* ทะเบียนรถ */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-700">
+                ทะเบียนรถ <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="license_plate"
+                placeholder="เช่น กข-1234 กทม"
+                value={formData.license_plate}
+                onChange={handleChange}
+                required
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1A1A1A] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1A1A1A] transition-all"
+              />
             </div>
-          ) : vehicles.length === 0 ? (
-            <div className="p-12 text-center text-neutral-400 text-sm">
-              ไม่พบข้อมูลรถจัดส่งในระบบ
+
+            {/* ยี่ห้อ / ประเภทรถ */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-700">
+                ยี่ห้อ / ประเภทรถ <span className="text-rose-500">*</span>
+              </label>
+              <select
+                name="brand_id"
+                value={formData.brand_id}
+                onChange={handleChange}
+                required
+                disabled={loadingBrands}
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1A1A1A] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1A1A1A] transition-all disabled:opacity-50"
+              ><option value="">-- เลือกรุ่น/ยี่ห้อรถ --</option>
+                {brands.map((b) => (
+                  <option key={b.brand_id} value={b.brand_id}>
+                    {b.brand_type}
+                  </option>
+                ))}
+              </select>
             </div>
-          ) : (
-            vehicles.map((vehicle) => {
-              const vehicleId = vehicle.vehicle_id;
-              const brandType = vehicle.brand_type;
-              const licensePlate = vehicle.license_plate;
-              const capacityKg = vehicle.capacity_kg;
-              const isAvailable = vehicle.status === 'available';
-              const isSelected = selectedVehicleId === vehicleId;
 
-              return (
-                <div
-                  key={vehicleId}
-                  onClick={() => isAvailable && setSelectedVehicleId(vehicleId)}
-                  className={`p-4 rounded-xl border transition-all flex items-center justify-between gap-4 cursor-pointer ${
-                    !isAvailable
-                      ? 'bg-neutral-50 border-neutral-200 opacity-60 cursor-not-allowed'
-                      : isSelected
-                      ? 'bg-blue-50/60 border-blue-500 shadow-xs ring-1 ring-blue-500'
-                      : 'bg-white border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/80'
-                  }`}
-                >
-                  <div className="flex items-center gap-3.5">
-                    <div className={`p-3 rounded-lg ${isSelected ? 'bg-blue-600 text-white' : 'bg-neutral-100 text-neutral-600'}`}>
-                      <Truck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-neutral-900 text-sm">{brandType}</p>
-                        <span className="text-[10px] px-2 py-0.5 bg-neutral-100 text-neutral-600 font-medium rounded-md">
-                          {capacityKg} กก.
-                        </span>
-                      </div>
-                      <p className="text-xs font-mono text-neutral-500 mt-1">
-                        ทะเบียน: {licensePlate}
-                      </p>
-                    </div>
-                  </div>
+            {/* ความจุ / น้ำหนักบรรทุกสูงสุด (กก.) */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-700">
+                น้ำหนักบรรทุกสูงสุด (กิโลกรัม)
+              </label>
+              <input
+                type="number"
+                name="capacity_kg"
+                placeholder="เช่น 1500"
+                min="0"
+                value={formData.capacity_kg}
+                onChange={handleChange}
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1A1A1A] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1A1A1A] transition-all"
+              />
+            </div>
+          </form>
 
-                  {/* Status Indicator */}
-                  <div>
-                    {!isAvailable ? (
-                      <span className="text-xs font-medium text-rose-500 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">
-                        ไม่พร้อมใช้งาน
-                      </span>
-                    ) : (
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
-                        isSelected ? 'border-blue-600 bg-blue-600 text-white' : 'border-neutral-300 bg-white'
-                      }`}>
-                        {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })
-          )}
+          {/* Footer Actions */}
+          <div className="p-4 border-t border-neutral-100 bg-neutral-50 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-1/2 px-4 py-2.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-200/60 rounded-lg transition-colors cursor-pointer"
+            >
+              ยกเลิก
+            </button>
+            <button
+              type="submit"
+              form="vehicle-form"
+              disabled={submitting}
+              className="w-1/2 flex justify-center items-center gap-2 bg-[#0B192C] hover:bg-[#1E3E62] text-white px-5 py-2.5 rounded-lg text-xs font-semibold transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+            >
+              {submitting ? (
+                <>
+                  <span>กำลังบันทึก...</span>
+                </>
+              ) : (
+                <>
+                  <span>บันทึกข้อมูล</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
-
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-end gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
-          >
-            ยกเลิก
-          </button>
-          <button
-            type="button"
-            disabled={!selectedVehicleId || isSubmitting}
-            onClick={handleConfirmQueue}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm ${
-              selectedVehicleId && !isSubmitting
-                ? 'bg-[#1A1A1A] hover:bg-neutral-800 text-white cursor-pointer'
-                : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-            }`}
-          >
-            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>ยืนยันจัดคิวส่ง</span>
-          </button>
-        </div>
-
       </div>
-    </>
+    </div>
   );
 }

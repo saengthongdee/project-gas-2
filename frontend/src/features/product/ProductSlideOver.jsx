@@ -94,7 +94,7 @@ export default function ProductSlideOver({ isOpen, onClose, mode = 'add', initia
               
               {/* ชื่อสินค้า */}
               <div>
-                <label className="block text-sm font-medium text-neutral-500 mb-1">
+                <label className="block text-sm font-medium text-[#4b4a4a] mb-1">
                   ชื่อสินค้า <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -104,20 +104,20 @@ export default function ProductSlideOver({ isOpen, onClose, mode = 'add', initia
                   placeholder="เช่น ถังแก๊สปตท. 15 กก., หัวปรับแรงดัน"
                   value={formData.product_name}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 placeholder-gray-400"
+                  className="w-full px-3.5 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-slate-800 placeholder-gray-400"
                 />
               </div>
 
               {/* หมวดหมู่ */}
               <div>
-                <label className="block text-xs font-medium text-neutral-500 mb-1">
+                <label className="block text-sm font-medium text-[#4b4a4a] mb-1">
                   หมวดหมู่ <span className="text-rose-500">*</span>
                 </label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2 border border-neutral-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-800 text-gray-800 cursor-pointer"
+                  className="w-full px-3.5 py-2 border border-neutral-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-800 text-gray-800 cursor-pointer"
                 >
                   <option value="gas">แก๊ส</option>
                   <option value="spare_part">อะไหล่/อุปกรณ์</option>
@@ -127,7 +127,7 @@ export default function ProductSlideOver({ isOpen, onClose, mode = 'add', initia
               {/* ราคาต้นทุน & ราคาขายปัจจุบัน */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-neutral-500 mb-1">
+                  <label className="block text-sm font-medium text-[#4b4a4a] mb-1">
                     ราคาต้นทุน (บาท)
                   </label>
                   <input
@@ -137,11 +137,11 @@ export default function ProductSlideOver({ isOpen, onClose, mode = 'add', initia
                     placeholder="0.00"
                     value={formData.cost_price}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2 border border-neutral-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-slate-800 placeholder-gray-400"
+                    className="w-full px-3.5 py-2 border border-neutral-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-800 placeholder-gray-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-neutral-500 mb-1">
+                  <label className="block text-sm font-medium text-[#4b4a4a] mb-1">
                     ราคาขาย (บาท) <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -152,7 +152,7 @@ export default function ProductSlideOver({ isOpen, onClose, mode = 'add', initia
                     placeholder="0.00"
                     value={formData.current_price}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2 border border-neutral-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-slate-800 placeholder-gray-400"
+                    className="w-full px-3.5 py-2 border border-neutral-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-800 placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -169,26 +169,25 @@ export default function ProductSlideOver({ isOpen, onClose, mode = 'add', initia
                   placeholder="0"
                   value={formData.stock_qty}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2 border border-neutral-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-slate-800 placeholder-gray-400"
+                  className="w-full px-3.5 py-2 border border-neutral-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-800 placeholder-gray-400"
                 />
               </div>
 
             </div>
 
             {/* Footer Actions */}
-            <div className="px-6 py-4 border-t border-neutral-200 bg-gray-50 flex items-center justify-end gap-3">
+            <div className="px-6 py-4 border-t border-neutral-200 bg-gray-50 flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-neutral-200 text-gray-700 bg-white hover:bg-gray-50 text-sm font-medium rounded-xl transition-all cursor-pointer"
+                className="w-1/2 px-4 py-2 border border-neutral-200 text-gray-700 bg-white hover:bg-gray-200 text-sm font-medium rounded-lg transition-all cursor-pointer"
               >
                 ยกเลิก
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-[#0B192C] hover:bg-[#1E3E62] text-white text-sm font-medium rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-              >
-                <Save className="w-4 h-4" /> บันทึกข้อมูล
+                className="w-1/2 justify-center px-5 py-2 bg-[#0B192C] hover:bg-[#1E3E62] text-white text-sm font-medium rounded-lg transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+              > บันทึกข้อมูล
               </button>
             </div>
           </form>

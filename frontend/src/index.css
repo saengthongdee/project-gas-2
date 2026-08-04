@@ -15,3 +15,11 @@
 .custom-scrollbar::-webkit-scrollbar-button {
   display: none;
 }
+
+.btn-primary {
+  background-color: #0B192C;
+  color: #FFFFFF;
+}
+.btn-primary:hover {
+  background-color: #1E3E62;
+}

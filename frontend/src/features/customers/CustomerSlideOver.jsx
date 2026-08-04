@@ -97,7 +97,7 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="เช่น เจ๊เพ็ญ ก๋วยเตี๋ยวเรือ"
                 value={formData.customer_name}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
               />
             </div>
 
@@ -112,7 +112,7 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="เช่น 089-111-2222"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
               />
             </div>
 
@@ -126,7 +126,7 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="ระบุบ้านเลขที่ ถนน ซอย หรือจุดสังเกต"
                 value={formData.address}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A] resize-none"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] resize-none"
               />
             </div>
 
@@ -140,12 +140,12 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="เช่น ร้านอยู่ล็อกกลาง ติดร้านน้ำแข็ง"
                 value={formData.delivery_note}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A] resize-none"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] resize-none"
               />
             </div>
           </div>
           
-          <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between gap-3 shrink-0">
+          <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-center gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
@@ -157,7 +157,7 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
             <button
               type="submit"
               disabled={loading}
-              className="w-1/2 flex justify-center items-center  gap-2 px-4 py-2 text-sm font-medium text-white bg-[#009966] hover:bg-[#006600] rounded-lg transition-colors disabled:opacity-50"
+              className="w-1/2 flex justify-center items-center  gap-2 px-4 py-2 text-sm font-medium text-white btn-primary rounded-lg transition-colors disabled:opacity-50"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>{initialData ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูล'}</span>

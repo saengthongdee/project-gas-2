@@ -23,7 +23,7 @@ const STATUS_MAP = {
 };
 
 export default function Delivery() {
-  const { loading, error, data: orders, fetchingData } = useDelivery();
+  const { loading, error, data: orders, fetchingData ,assignVehicle } = useDelivery();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -40,9 +40,7 @@ export default function Delivery() {
   }, [orders, searchTerm, selectedStatus]);
 
   const selectableOrdersInFilter = useMemo(() => {
-    return filteredOrders.filter(
-      (o) => o.delivery_status !== 'cancelled' && o.delivery_status !== 'delivered'
-    );
+    return filteredOrders.filter((o) => o.delivery_status === 'pending');
   }, [filteredOrders]);
 
   const stats = useMemo(() => {
@@ -76,6 +74,27 @@ export default function Delivery() {
     return selectableOrdersInFilter.every((o) => selectedOrderIds.includes(o.order_id));
   }, [selectableOrdersInFilter, selectedOrderIds]);
 
+  const handleAssignQueue = async (payload) => {
+
+    try {
+
+      console.log("Delivery.jsx received payload:", payload);
+
+      const result = await assignVehicle(payload);
+
+      if (result?.success) {
+
+        setSelectedOrderIds([]);
+        setIsSlideOverOpen(false);
+
+      } else {
+        alert(result?.error || "เกิดข้อผิดพลาดในการจัดคิวส่ง");
+      }
+    } catch (err) {
+      console.error("Failed to assign queue in Delivery.jsx:", err);
+    }
+  };
+
   return (
     <div className="max-w-7xl min-h-screen p-6 mx-auto space-y-6 bg-gray-50/30 text-gray-800">
       
@@ -88,14 +107,6 @@ export default function Delivery() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
-          <button
-            onClick={fetchingData}
-            className="p-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg transition-all shadow-sm flex items-center justify-center cursor-pointer"
-            title="รีเฟรชข้อมูล"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-
           <button
             onClick={() => setIsSlideOverOpen(true)}
             disabled={selectedOrderIds.length === 0}
@@ -234,10 +245,10 @@ export default function Delivery() {
                   </th>
                   <th className="py-3.5 px-4">#</th>
                   <th className="py-3.5 px-4">รหัสออเดอร์</th>
+                  <th className="py-3.5 px-4">ที่อยู่</th>
                   <th className="py-3.5 px-4 text-right">วันที่สั่งซื้อ</th>
                   <th className="py-3.5 px-4 text-right">ยอดรวม (บาท)</th>
                   <th className="py-3.5 px-4 text-center">สถานะการจัดส่ง</th>
-                  <th className="py-3.5 px-4 text-center">จัดการ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 text-sm">
@@ -247,7 +258,7 @@ export default function Delivery() {
                     label: order.delivery_status,
                     bg: 'bg-gray-100 text-gray-600 border-gray-200',
                   };
-                  const isDisableSelect = order.delivery_status === 'cancelled' || order.delivery_status === 'delivered';
+                  const isDisableSelect = order.delivery_status !== 'pending';
 
                   return (
                     <tr
@@ -270,6 +281,7 @@ export default function Delivery() {
 
                       <td className="py-3.5 px-4 text-gray-600">{index + 1}</td>
                       <td className="py-3.5 px-4 font-semibold text-gray-900">#{order.order_id}</td>
+                      <td className="py-3.5 px-4 text-gray-600">{order.address || '-'}</td>
                       <td className="py-3.5 px-4 text-right text-gray-600">
                         {order.order_date ? new Date(order.order_date).toLocaleDateString('th-TH', {
                           year: 'numeric',
@@ -288,17 +300,6 @@ export default function Delivery() {
                           {statusInfo.label}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            onClick={() => console.log("View order details:", order.order_id)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                            title="ดูรายละเอียด"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
                     </tr>
                   );
                 })}
@@ -314,7 +315,7 @@ export default function Delivery() {
         onClose={() => setIsSlideOverOpen(false)}
         selectedOrderIds={selectedOrderIds}
         setSelectedOrderIds={setSelectedOrderIds}
-        onSuccess={fetchingData}
+        onSuccess={handleAssignQueue}
       />
 
     </div>

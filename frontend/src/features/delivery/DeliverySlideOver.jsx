@@ -9,7 +9,6 @@ export default function DeliverySlideOver({
   setSelectedOrderIds,
   onSuccess,
 }) {
-  // ❌ อย่าใส่ if (!isOpen) return null; ตรงนี้นะครับ
 
   const { loading: vehiclesLoading, data: vehicleResponse, vehicles: vehicleList } = useVehicles() || {};
   
@@ -33,13 +32,14 @@ export default function DeliverySlideOver({
 
       console.log("Submitting Queue Delivery Payload:", payload);
 
+      if (typeof onSuccess === 'function') {
+        onSuccess(payload);
+      }
+
       setSelectedOrderIds([]);
       setSelectedVehicleId('');
       onClose();
-
-      if (typeof onSuccess === 'function') {
-        onSuccess();
-      }
+      
     } catch (err) {
       console.error("Failed to assign queue:", err);
     } finally {
@@ -64,7 +64,7 @@ export default function DeliverySlideOver({
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
+        <div className="flex items-center  justify-between px-6 py-4 border-b border-neutral-200">
           <div>
             <h2 className="text-lg font-bold text-[#1A1A1A]">เลือกรถสำหรับจัดส่งสินค้า</h2>
             <p className="text-xs text-neutral-500 mt-0.5">
@@ -96,6 +96,7 @@ export default function DeliverySlideOver({
             </div>
           ) : (
             vehicles.map((vehicle) => {
+
               const vehicleId = vehicle.vehicle_id;
               const brandType = vehicle.brand_type;
               const licensePlate = vehicle.license_plate;
@@ -111,12 +112,12 @@ export default function DeliverySlideOver({
                     !isAvailable
                       ? 'bg-neutral-50 border-neutral-200 opacity-60 cursor-not-allowed'
                       : isSelected
-                      ? 'bg-blue-50/60 border-blue-500 shadow-xs ring-1 ring-blue-500'
+                      ? 'bg-blue-50/60 border-blue-100 shadow-xs ring-1 ring-blue-500'
                       : 'bg-white border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/80'
                   }`}
                 >
                   <div className="flex items-center gap-3.5">
-                    <div className={`p-3 rounded-lg ${isSelected ? 'bg-blue-600 text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+                    <div className={`p-3 rounded-lg ${isSelected ? 'bg-blue-500 text-white' : 'bg-neutral-100 text-neutral-600'}`}>
                       <Truck className="w-5 h-5" />
                     </div>
                     <div>
@@ -152,12 +153,12 @@ export default function DeliverySlideOver({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-end gap-3 shrink-0">
+        <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-center gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
+            className="w-1/2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
           >
             ยกเลิก
           </button>
@@ -165,9 +166,9 @@ export default function DeliverySlideOver({
             type="button"
             disabled={!selectedVehicleId || isSubmitting}
             onClick={handleConfirmQueue}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm ${
+            className={`w-1/2  flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm ${
               selectedVehicleId && !isSubmitting
-                ? 'bg-[#1A1A1A] hover:bg-neutral-800 text-white cursor-pointer'
+                ? 'btn-primary'
                 : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
             }`}
           >

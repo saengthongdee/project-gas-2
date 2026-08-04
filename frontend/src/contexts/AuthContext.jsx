@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('gas-token', newToken)
         localStorage.setItem('gas-role_ID', JSON.stringify(role_ID))
         setToken(newToken)
-        set(role_ID)
+        setRole(role_ID)
     }
 
     const logout = () => {

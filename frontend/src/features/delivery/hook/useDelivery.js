@@ -26,9 +26,32 @@ export const useDelivery = () => {
         }
     }
 
+    const assignVehicle = async (payload) => {
+
+        try{
+
+            setLoading(true);
+            setError(null);
+
+            const response = await axiosInstance.put("/order/delivery", payload);
+
+            if(response.status === 200) {
+
+                fetchingData();
+                return response.data;
+            }
+
+        }catch(err) {
+            setError(err.response?.data?.message || err.message);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchingData();
     }, []);
 
-    return { loading, error, data, fetchingData };
+    return { loading, error, data, fetchingData, assignVehicle };
 }

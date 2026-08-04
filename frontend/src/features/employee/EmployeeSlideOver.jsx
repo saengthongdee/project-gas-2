@@ -167,7 +167,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="เช่น นายสมชาย สายซิ่ง"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
               />
             </div>
 
@@ -182,7 +182,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="เช่น 086-222-3333"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
               />
             </div>
 
@@ -197,7 +197,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
                 placeholder="เช่น somchai@gas.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
               />
             </div>
 
@@ -209,7 +209,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
                 name="role_id"
                 value={formData.role_id}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
+                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
               >
                 <option value="1">ผู้จัดการร้าน</option>
                 <option value="2">แอดมินรับโทรศัพท์</option>
@@ -230,7 +230,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
                   name="vehicle_id"
                   value={formData.vehicle_id}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
+                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
                 >
                   <option value="">-- ไม่ระบุ / เลือกยานพาหนะ --</option>
                   {vehicles.map((v) => {
@@ -249,19 +249,19 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
             )}
           </div>
 
-          <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-end gap-3 shrink-0">
+          <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-center gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors"
+              className="w-1/2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors"
             >
               ยกเลิก
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1A1A1A] hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-50"
+              className="w-1/2  flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium text-white btn-primary hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-50"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>{initialData ? "บันทึกการแก้ไข" : "บันทึกข้อมูล"}</span>
