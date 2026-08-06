@@ -12,8 +12,9 @@ const ROLE_MAP = {
 };
 
 export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData }) {
-  const { vehicles } = useVehicles();
-  const { brands } = useVehicleBrands();
+  // 💡 ดึงทั้ง vehicles (รถทั้งหมด) และ vehicleIsNull (รถที่ว่าง) ออกมา
+  const { vehicles = [], vehicleIsNull = [], refetch } = useVehicles() || {};
+  const { brands = [] } = useVehicleBrands() || {};
 
   const [formData, setFormData] = useState({
     name: "",
@@ -28,6 +29,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
   const isDriver = String(formData.role_id) === "3";
 
   const getBrandName = (brandId) => {
+    if (!Array.isArray(brands)) return "";
     const brand = brands.find((b) => b.brand_id === brandId);
     return brand ? brand.brand_type : "";
   };
@@ -50,10 +52,12 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
   };
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (initialData) {
       let matchedVehicleId = initialData.vehicle_id ? String(initialData.vehicle_id) : "";
 
-      if (!matchedVehicleId && initialData.license_plate) {
+      if (!matchedVehicleId && initialData.license_plate && Array.isArray(vehicles)) {
         const matchedVehicle = vehicles.find(
           (v) => v.license_plate === initialData.license_plate
         );
@@ -79,16 +83,14 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
       });
     }
     setError(null);
-  }, [initialData, isOpen, vehicles]);
+  }, [initialData, isOpen]);
 
-  // 💡 จุดแก้ไข: เคลียร์ค่า selected_vehicle_id ทันทีเมื่อเปลี่ยนจากคนขับรถเป็นตำแหน่งอื่น
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
 
-      // ถ้าเปลี่ยน Role เป็นตำแหน่งอื่นที่ไม่ใช่ "คนขับรถส่งแก๊ส" (role_id !== "3") ให้ล้างยานพาหนะทันที
       if (name === "role_id" && value !== "3") {
         updated.vehicle_id = "";
       }
@@ -102,7 +104,6 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
     setLoading(true);
     setError(null);
 
-    // 💡 ส่ง vehicle_id เป็น null ชัดเจนเมื่อไม่ใช่คนขับรถ
     const payload = {
       name: formData.name,
       phone: formData.phone,
@@ -114,6 +115,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
     try {
       await onSave(payload);
       onClose();
+      if (refetch) refetch();
     } catch (err) {
       setError(err.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     } finally {
@@ -233,17 +235,38 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
                   className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
                 >
                   <option value="">-- ไม่ระบุ / เลือกยานพาหนะ --</option>
-                  {vehicles.map((v) => {
-                    const brandName = getBrandName(v.brand_id);
-                    return (
-                      <option key={v.vehicle_id} value={v.vehicle_id}>
-                        {v.license_plate} {brandName ? `(${brandName})` : ""}
-                      </option>
-                    );
-                  })}
+
+                  {/* วนลูปแสดงรถทุกคัน */}
+                  {Array.isArray(vehicles) &&
+                    vehicles.map((v) => {
+                      const brandName = getBrandName(v.brand_id);
+                      
+                      // เช็กว่าเป็นรถของคนนี้หรือไม่
+                      const isCurrentVehicle = String(v.vehicle_id) === String(formData.vehicle_id);
+                      
+                      // เช็กว่าอยู่ในรายการรถที่ว่างหรือไม่
+                      const isAvailable = Array.isArray(vehicleIsNull) && vehicleIsNull.some(
+                        (nullVehicle) => String(nullVehicle.vehicle_id) === String(v.vehicle_id)
+                      );
+
+                      // ถ้ารู้สึกว่าไม่อยู่ใน vehicleIsNull และไม่ใช่รถคันปัจจุบัน = รถไม่ว่าง
+                      const isBusy = !isAvailable && !isCurrentVehicle;
+
+                      return (
+                        <option
+                          key={v.vehicle_id}
+                          value={v.vehicle_id}
+                          disabled={isBusy} // ห้ามเลือกถ้าไม่ว่าง
+                          className={isBusy ? "text-neutral-400 bg-neutral-100" : ""}
+                        >
+                          {v.license_plate} {brandName ? `(${brandName})` : ""}{" "}
+                          {isBusy ? "(รถไม่ว่าง)" : isCurrentVehicle ? "(รถปัจจุบัน)" : ""}
+                        </option>
+                      );
+                    })}
                 </select>
                 <p className="text-xs text-neutral-400 mt-1.5">
-                  * ดึงข้อมูลรายชื่อยานพาหนะจากระบบคลังยานพาหนะจริง
+                  * รายการที่แสดง (รถไม่ว่าง) คือรถที่มีพนักงานคนอื่นประจำการอยู่แล้ว
                 </p>
               </div>
             )}
@@ -261,7 +284,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
             <button
               type="submit"
               disabled={loading}
-              className="w-1/2  flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium text-white btn-primary hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-50"
+              className="w-1/2 flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-black hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-50"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>{initialData ? "บันทึกการแก้ไข" : "บันทึกข้อมูล"}</span>

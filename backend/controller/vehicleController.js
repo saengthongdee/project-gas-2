@@ -33,3 +33,10 @@ exports.deleteVehicle =asyncHandler(async(req,res,next)=>{
     const result =await vehicleService.deleteVehicle(id);
     res.status(200).json(result);
 })
+
+exports.findVehicleISNull = asyncHandler(async(req,res,next)=>{
+
+    const result =await vehicleService.findVehicleISNull();
+    res.status(200).json(result);
+    
+})

@@ -6,7 +6,7 @@ import axiosInstance from '../../../api/axiosInstance'
 export const useLogin = () => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
-    
+
     const { login } = useAuth() 
     const navigate = useNavigate()
 
@@ -22,19 +22,20 @@ export const useLogin = () => {
 
             const response = await axiosInstance.post('/auth/login', { email, password })
             const { token } = response.data;
-            const { role_ID} = response.data;
+            const { role_ID } = response.data;
+            const { employee_name } = response.data;
 
-            console.log(role_ID);
+            console.log(employee_name);
 
             if(role_ID != 1 && role_ID != 2) {
                 setError('ไม่มีสิทธิเข้าถึงข้อมูล')
                 return;
             } 
 
-            login(token , role_ID)
+            login(token, role_ID, employee_name)
 
             navigate('/', { replace: true })
-            
+
         } catch (err) {
             setError(err.response?.data?.message || 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง')
         } finally {

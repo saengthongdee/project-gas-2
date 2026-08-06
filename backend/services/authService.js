@@ -43,7 +43,8 @@ const login =async (email,password )=>{
                 success: true,
                 message: "Login successfull",
                 token: token,
-                role_ID: roleValue
+                role_ID: roleValue,
+                employee_name: user.name
             })
 
             })

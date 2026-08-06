@@ -25,11 +25,24 @@ const updateVehicleStatus = async(vehicle_id,status,callback)=>{
     db.query(sql,[status,vehicle_id],callback);
 }
 
+const findVehicleISNull = async(callback) => {
+
+    const sql = 
+    `
+    SELECT v.vehicle_id , v.license_plate  FROM vehicles v
+	    LEFT JOIN employees e 
+		    ON v.vehicle_id = e.vehicle_id
+    	WHERE e.employee_id IS NULL
+    `
+    db.query(sql,callback);
+}
+
 module.exports={
     findAllVehicle,
     createVehicle,
     updateVehicle,
     deleteVehicle,
-    updateVehicleStatus
+    updateVehicleStatus,
+    findVehicleISNull
 
 }

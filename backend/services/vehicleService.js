@@ -56,9 +56,27 @@ const deleteVehicle = async(vehicle_id)=>{
     })
 }
 
+const findVehicleISNull = async() => {
+    
+    return new Promise((success , fail ) => {
+
+        vehicleModel.findVehicleISNull((err , results) => {
+
+            if(err) { return fail(err)}
+
+            success({
+                success:true,
+                message:"Vehicle retrived successfully",
+                data:results
+            })
+        })
+    })
+}
+
 module.exports={
     findAllVehicle,
     createVehicle,
     updateVehicle,
+    findVehicleISNull,
     deleteVehicle
 }
