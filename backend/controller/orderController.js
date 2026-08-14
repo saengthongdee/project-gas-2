@@ -45,3 +45,13 @@ exports.updateOrderVehicle = asyncHandler(async (req, res, next) => {
   const result = await orderService.updateOrderVehicle(order_ids, vehicle_id);
   res.status(200).json(result);
 });
+
+exports.findOrdertodayByVehicle = asyncHandler(async(req , res , next) => {
+
+    const id = req.params.id
+
+    if(!id) {return next(new ApiError(400 , "vehicle_id is not requried"))}
+
+    const results = await orderService.findOrdertodayByVehicle(id)
+    res.status(200).json(results)
+})

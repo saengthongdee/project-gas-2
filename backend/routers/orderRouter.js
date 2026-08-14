@@ -8,7 +8,8 @@ const {
   deleteOrders,
   findOrderbyStatus,
   updateOrderVehicle,
-  updateOrderStatus
+  updateOrderStatus,
+  findOrdertodayByVehicle
 } = require("../controller/orderController");
 
 //router.use(authMiddleware)
@@ -18,5 +19,6 @@ router.post("/", createOrders);
 router.delete("/:id", deleteOrders);
 router.get("/status", findOrderbyStatus);
 router.put("/delivery", updateOrderVehicle);
+router.get('/driver/:id' , findOrdertodayByVehicle)
 
 module.exports = router;

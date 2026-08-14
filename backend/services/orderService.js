@@ -132,10 +132,27 @@ const updateOrderVehicle = async(order_id,vehicle_id) => {
     })
 }
 
+const findOrdertodayByVehicle = async(vehicle_id) => {
+
+    return new Promise((success , fiil) => {
+
+        orderModel.findOrdertodayByVehicle(vehicle_id , (err , results) => {
+            if(err) { return fail(err)}
+            
+            success({
+                success: true,
+                message: "Fetch ordertoday successfully",
+                data : results
+            })
+        })
+    })
+}
+
 module.exports={
     createOrder,
     getAllOrder,
     deleteOrder,
     findOrderbyStatus,
-    updateOrderVehicle
+    updateOrderVehicle,
+    findOrdertodayByVehicle
 }

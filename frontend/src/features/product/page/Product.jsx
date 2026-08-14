@@ -259,11 +259,11 @@ export default function Product() {
                       {/* จำนวนสต็อก พร้อมแจ้งเตือน < 10 */}
                       <td className="py-3.5 px-4 text-center">
                         <div className="flex flex-col items-center justify-center">
-                          <span className={`font-semibold ${isLowStock ? 'text-rose-600' : 'text-gray-700'}`}>
+                          <span className={`font-medium ${isLowStock ? 'text-rose-600' : 'text-gray-700'}`}>
                             {stockQty.toLocaleString()}
                           </span>
                           {isLowStock && (
-                            <span className="text-[10px] bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full border border-rose-100 font-medium mt-0.5 flex items-center gap-1">
+                            <span className="text-[10px] bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full border border-rose-100 mt-0.5 flex items-center gap-1">
                               <AlertCircle className="w-3 h-3" /> สต็อกเหลือน้อย
                             </span>
                           )}
