@@ -1,34 +1,51 @@
 const orderModel = require('../models/orderModel')
 const vihicleModel = require('../models/vehicleModel')
 const items_order = require('../models/order_itemModel')
+const productModel = require('../models/productModel')
 
 const ApiError =require('../utils/ApiError')
 const authMiddleware =require('../middlewares/authMiddleware')
 
-const createOrder = async(orderdata)=>{
-    return new Promise((success,fail)=> {
-        const {items, ...mainOrderData} = orderdata;
+const createOrder = async (orderdata) => {
+    return new Promise((success, fail) => {
+        const { items, ...mainOrderData } = orderdata;
 
-        orderModel.createOrder(mainOrderData,(error,results)=>{
-            if(error){return fail(error)}
+        productModel.checkStock(items, (stockError, stockCheck) => {
+            if (stockError) { return fail(stockError); }
 
-            const order_id = results.insertId || results.order_id;
-            if(!order_id){
-                return fail(new Error(
-                    "Cannot retirved order_id, Insert might have failed."
-                ));
+            if (!stockCheck.sufficient) {
+                return success({
+                    success: false,
+                    message: "Insufficient stock for one or more items",
+                    insufficient_items: stockCheck.insufficient_items
+                });
             }
 
-            items_order.Createitem_order(order_id,items,(error,results)=>{
-                if(error){return fail(error)}
-                success({
-                    success:true,
-                    message:"create successfully"
-                })
-            })
-        })
-    })
-}
+            orderModel.createOrder(mainOrderData, (error, results) => {
+                if (error) { return fail(error); }
+
+                const order_id = results.insertId || results.order_id;
+                if (!order_id) {
+                    return fail(new Error("Cannot retrieved order_id, Insert might have failed."));
+                }
+
+                items_order.Createitem_order(order_id, items, (error, results) => {
+                    if (error) { return fail(error); }
+
+                    productModel.updateStock(items, (error) => {
+                        
+                        if (error) { return fail(error); }
+
+                        success({
+                            success: true,
+                            message: "create successfully and stock updated"
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
 const getAllOrder = async()=>{
     return new Promise((success,fail)=>{
         const fetchOrder = new Promise ((resolve,reject)=>{
@@ -148,11 +165,58 @@ const findOrdertodayByVehicle = async(vehicle_id) => {
     })
 }
 
+const findOneOrder = async(order_id) => {
+
+    return new Promise((success , fail) => {
+
+        orderModel.findOneOrder(order_id , (err , resultSCustomer) => {
+
+            if(err) {return fail(err)}
+
+            items_order.findOneOrder_Item(order_id , (err , resultItem) => {
+                
+            success({
+                success: true,
+                message: "fetching detail order successfully",
+                data: {
+                    ...resultSCustomer[0],
+                    items: resultItem
+                }
+            });
+            })
+        })
+    })
+}
+
+const uploadImage = async(order_id , imagePath) => {
+
+    return new Promise((success , fail) => {
+        orderModel.uploadImage(order_id , imagePath,(err , result) => {
+
+            if(err) {return fail(err)}
+
+            orderModel.updateOrderStatus(order_id , "delivered" ,(err , result) => {
+
+                if(err){return fail(err)}
+                
+                success({
+                    success: true,
+                    message: "upload image successfully"
+                })
+            })
+
+
+        })
+    })
+}
+
 module.exports={
     createOrder,
     getAllOrder,
     deleteOrder,
     findOrderbyStatus,
     updateOrderVehicle,
-    findOrdertodayByVehicle
+    findOrdertodayByVehicle,
+    findOneOrder,
+    uploadImage
 }

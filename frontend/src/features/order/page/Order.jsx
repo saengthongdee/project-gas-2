@@ -31,31 +31,43 @@ export default function Order() {
   // State สำหรับ Search & Filter
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSaveOrder = async (payload) => {
-
+const handleSaveOrder = async (payload) => {
     console.log("Payload to save:", payload);
 
     try {
+        if (selectedOrder) {
+            const itemsToUpdate = payload.items || payload;
+            await updateOrderItems(selectedOrder.order_id, itemsToUpdate);
+            toast.success("อัปเดตรายการสินค้าสำเร็จ!");
+        } else {
+            const result = await createOrder(payload);
 
-      if (selectedOrder) {
+            if (result?.success === false) {
+                if (result.insufficient_items?.length) {
+                    const names = result.insufficient_items
+                        .map((i) => `#${i.product_id} (ขอ ${i.requested}, เหลือ ${i.available})`)
+                        .join(", ");
+                    toast.error(`สินค้าไม่พอ: ${names}`);
 
-        const itemsToUpdate = payload.items || payload;
-        await updateOrderItems(selectedOrder.order_id, itemsToUpdate);
-        toast.success("อัปเดตรายการสินค้าสำเร็จ!");
-      } else {
+                    await refetch();
+                } else {
+                    toast.error(result.message || "สร้างออเดอร์ไม่สำเร็จ");
+                    await refetch();
+                }
+                return;
+            }
 
-        await createOrder(payload);
-        toast.success("สร้างออเดอร์ใหม่สำเร็จ!");
+            toast.success("สร้างออเดอร์ใหม่สำเร็จ!");
+        }
 
-      }
-      refetch()
-      setIsSlideOverOpen(false);
+        refetch();
+        setIsSlideOverOpen(false);
 
     } catch (err) {
-      console.error("เกิดข้อผิดพลาดในการบันทึกออเดอร์:", err);
-      toast.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+        console.error("เกิดข้อผิดพลาดในการบันทึกออเดอร์:", err);
+        toast.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
-  };
+};
 
 
   const filteredOrders = useMemo(() => { return orders.filter((item) => {

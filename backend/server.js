@@ -4,6 +4,8 @@ const cors = require('cors')
 const dotenv = require('dotenv')
 const app = express()
 
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(cors())
 app.use(express.json())
@@ -12,6 +14,7 @@ const db = require('./configs/db')
 
 const notfound = require('./middlewares/notfound')
 const errorHandler = require('./middlewares/errorHandler')
+
 
 //routes 
 const authRouter =require('./routers/authRouter')

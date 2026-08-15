@@ -50,6 +50,19 @@ const findAllbyOrder_id = (order_id,callback)=>{
     db.query(sql,order_id,callback)
 }
 
+const findOneOrder_Item = (order_id , callback) => {
+
+    const sql = 
+    
+    `
+        select oi.item_id as id , p.product_name, oi.quantity , oi.unit_price as price from order_items oi
+	        join products p
+		        on oi.product_id = p.product_id where oi.order_id = ?
+    `
+
+    db.query(sql , order_id ,callback)
+}
+
 
 module.exports = {
     Createitem_order,
@@ -58,5 +71,6 @@ module.exports = {
     findAllitem,
     deleteOrder_item,
     findAllbyOrder_id,
+    findOneOrder_Item
 
 }

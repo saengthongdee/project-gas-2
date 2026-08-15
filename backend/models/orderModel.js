@@ -80,6 +80,25 @@ const findOrdertodayByVehicle = (vehicle_id , callback) => {
     db.query(sql , vehicle_id , callback)
 }
 
+const findOneOrder = (order_id , callback) => {
+
+    const sql = 
+    `
+        select o.order_id , o.order_date , o.delivery_status ,c.customer_name, c.phone,c.address , c.delivery_note, c.latitude , c.longitude from orders o
+	            join customers c 
+		    on o.customer_id = c.customer_id where order_id = ?
+    `
+
+    db.query(sql , order_id , callback)
+}
+
+const uploadImage = (order_id , imagePath , callback) => {
+
+    const sql = `update orders set imageUrl = ? where order_id = ?`
+
+    db.query(sql , [imagePath , order_id]  , callback)
+}
+
 module.exports={
     createOrder,
     updateOrder_Decrement,
@@ -91,5 +110,7 @@ module.exports={
     findOrderbyStatus,
     updateOrderVehicle,
     updateOrderStatus,
-    findOrdertodayByVehicle
+    findOrdertodayByVehicle,
+    findOneOrder,
+    uploadImage
 }

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require('../middlewares/upload');
 
 const authMiddleware = require("../middlewares/authMiddleware");
 const {
@@ -9,7 +10,9 @@ const {
   findOrderbyStatus,
   updateOrderVehicle,
   updateOrderStatus,
-  findOrdertodayByVehicle
+  findOrdertodayByVehicle,
+  findOneOrder,
+  uploadImage
 } = require("../controller/orderController");
 
 //router.use(authMiddleware)
@@ -20,5 +23,7 @@ router.delete("/:id", deleteOrders);
 router.get("/status", findOrderbyStatus);
 router.put("/delivery", updateOrderVehicle);
 router.get('/driver/:id' , findOrdertodayByVehicle)
+router.get('/subdetail/:id' , findOneOrder)
+router.put('/upload/:order_id', uploadImage);
 
 module.exports = router;

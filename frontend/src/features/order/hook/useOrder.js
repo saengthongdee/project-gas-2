@@ -29,28 +29,32 @@ export const useOrder = () => {
 
 
   // 2. สร้างออเดอร์ใหม่ (Create)
-  const createOrder = async (orderData) => {
+const createOrder = async (orderData) => {
     try {
+        setLoading(true);
+        setError(null);
 
-      setLoading(true);
-      setError(null);
+        const response = await axiosInstance.post("/order", orderData);
 
-      const response = await axiosInstance.post("/order", orderData);
+        if (response.data.success) {
+            setData((prev) => [
+                response.data.order || response.data.data || orderData,
+                ...prev,
+            ]);
+        } else {
+            setError(response.data.message || "Failed to create order");
+        }
 
-      if (response.ok) {
-        setData((prev) => [
-          response.data.order || response.data || orderData,
-          ...prev,
-        ]);
-      }
-      return response.data;
+        return response.data;
 
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+        const message = err.response?.data?.message || err.message;
+        setError(message);
+        throw err;
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   const updateOrderItems = async (orderId, itemsArray) => {
     try {
