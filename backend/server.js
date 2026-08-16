@@ -1,8 +1,9 @@
 require('dotenv').config();
 const express = require('express')
 const cors = require('cors')
-const dotenv = require('dotenv')
 const app = express()
+const http = require('http')
+const { Server } = require('socket.io') // 1. นำเข้า Socket.io
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -45,14 +46,34 @@ app.use('/api/maintenence',maintenenceRouter)
 app.use(notfound)
 app.use(errorHandler)
 
+// 2. สร้าง HTTP Server ครอบ Express app และตั้งค่า Socket.io
+const server = http.createServer(app)
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+})
+
+// 3. ผูก io ไว้กับ app เพื่อให้ดึงไปใช้ใน Controller ได้ผ่าน req.app.get('io')
+app.set('io', io)
+
+io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.id}`)
+
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`)
+    })
+})
+
 const port = process.env.port || 5000
 
-const server = app.listen(port, () => {
+// 4. เปลี่ยนจาก app.listen มาเป็น server.listen แทน
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`)
 })
 
-process.on(`unhandledRejecttion` ,(err,promise) =>{
+process.on('unhandledRejection', (err, promise) => {
     console.log(`Logged Error: ${err}`)
     server.close(() => process.exit(1))
 })
-

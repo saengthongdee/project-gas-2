@@ -67,7 +67,7 @@ exports.findOneOrder = asyncHandler(async (req , res , next ) => {
 })
 exports.uploadImage = asyncHandler(async (req, res, next) => {
     const { order_id } = req.params;
-    const { imageBase64 } = req.body; // รับภาพมาแบบ Base64 ทาง Body
+    const { imageBase64 } = req.body;
 
     if (!order_id || !imageBase64) {
         return next(new ApiError(400, "order_id and imageBase64 are required"));
@@ -94,6 +94,15 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
     // 5. สร้าง Path สำหรับบันทึกลง Database
     const imagePath = `/uploads/${filename}`;
     const result = await orderService.uploadImage(order_id, imagePath);
+
+    const io = req.app.get('io')
+    
+    if(io) {
+        io.emit('order_status_update' , {
+            order_id: Number(order_id),
+            status : 'delivered',
+        })
+    }
 
     res.status(200).json(result);
 });

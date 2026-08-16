@@ -102,11 +102,32 @@ const updateStock = (items, callback) => {
     });
 };
 
+const increaseStock = (product_id, quantity, callback) => {
+
+    const sql = `UPDATE products SET stock_qty = stock_qty + ? WHERE product_id = ?`;
+    db.query(sql, [quantity, product_id], callback);
+};
+
+const decreaseStock = (product_id, quantity, callback) => {
+
+    const sql = `UPDATE products SET stock_qty = stock_qty - ? WHERE product_id = ? AND stock_qty >= ?`;
+    
+    db.query(sql, [quantity, product_id, quantity], (error, results) => {
+        if (error) return callback(error);
+        if (results.affectedRows === 0) {
+            return callback(new Error(`สินค้า ID ${product_id} สต็อกไม่เพียงพอ`));
+        }
+        callback(null, results);
+    });
+};
+
 module.exports = {
     findAllProduct,
     createProduct,
     updateProduct,
     deleteProduct,
     checkStock,
-    updateStock
+    updateStock,
+    increaseStock,
+    decreaseStock
 }

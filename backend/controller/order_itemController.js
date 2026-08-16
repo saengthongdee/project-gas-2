@@ -11,6 +11,7 @@ exports.updateOrder_item = asyncHandler(async(req,res,next)=>{
         return next(new ApiError(400, "order_id and items array are required"));
     }
     const result =await order_itemService.updateMultipleItemOrders(order_id, items)
+    
     res.status(200).json(result)
 })
 

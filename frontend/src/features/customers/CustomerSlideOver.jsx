@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Loader2 } from 'lucide-react'
+import { X, Loader2, MapPin, ExternalLink } from 'lucide-react'
 
 export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData }) {
   const [formData, setFormData] = useState({
@@ -7,7 +7,12 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
     phone: '',
     address: '',
     delivery_note: '',
+    latitude: '',
+    longitude: '',
   })
+  
+  // State สำหรับช่องวางพิกัดด่วนจาก Google Maps
+  const [mapInput, setMapInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -18,14 +23,20 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
         phone: initialData.phone || '',
         address: initialData.address || '',
         delivery_note: initialData.delivery_note || '',
+        latitude: initialData.latitude || '',
+        longitude: initialData.longitude || '',
       })
+      setMapInput(initialData.latitude && initialData.longitude ? `${initialData.latitude}, ${initialData.longitude}` : '')
     } else {
       setFormData({
         customer_name: '',
         phone: '',
         address: '',
         delivery_note: '',
+        latitude: '',
+        longitude: '',
       })
+      setMapInput('')
     }
     setError(null)
   }, [initialData, isOpen])
@@ -35,13 +46,31 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e) => {
+  // ฟังก์ชันช่วยจัดการเมื่อผู้ใช้นำพิกัดหรือลิงก์จาก Google Maps มาวาง
+  const handleMapPasteInput = (e) => {
+    const value = e.target.value
+    setMapInput(value)
 
+    // พยายามดึง Lat, Lng จากข้อความที่ผู้ใช้วาง (รองรับทั้งแบบพิกัดตรงๆ เช่น 13.7563, 100.5017 หรือลิงก์ Google Maps)
+    const coordRegex = /(-?\d+\.\d+),\s*(-?\d+\.\d+)/
+    const match = value.match(coordRegex)
+
+    if (match) {
+      setFormData((prev) => ({
+        ...prev,
+        latitude: match[1],
+        longitude: match[2],
+      }))
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
     try {
+      // ส่งข้อมูลก้อนเดิมออกไปหลังบ้านตามปกติ (ไม่ต้องแก้หลังบ้าน)
       await onSave(formData)
       onClose()
     } catch (err) {
@@ -78,8 +107,8 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between min-h-0">
-          <div className="p-6 space-y-4 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex-1  flex flex-col justify-between min-h-0">
+          <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
                 {error}
@@ -130,6 +159,62 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
               />
             </div>
 
+            {/* ส่วนเลือกพิกัดจาก Google Maps แบบง่าย */}
+            <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-neutral-700 uppercase tracking-wide flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-blue-600" /> เลือกพิกัดจาก Google Maps
+                </span>
+                <a
+                  href="https://www.google.com/maps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 bg-white border border-blue-200 px-2.5 py-1 rounded-md shadow-sm transition-colors"
+                >
+                  <span>เปิด Google Maps</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div>
+                <label className="block text-xs text-neutral-500 mb-1">
+                  วางพิกัด หรือ ลิงก์ Google Maps ที่นี่ (ระบบจะแยกให้อัตโนมัติ)
+                </label>
+                <input
+                  type="text"
+                  placeholder="เช่น 13.7563, 100.5017 หรือวางลิงก์ Maps"
+                  value={mapInput}
+                  onChange={handleMapPasteInput}
+                  className="w-full px-3 py-1.5 text-xs bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label className="block text-[11px] text-neutral-500 mb-0.5">Latitude</label>
+                  <input
+                    type="text"
+                    name="latitude"
+                    value={formData.latitude}
+                    onChange={handleChange}
+                    placeholder="13.7563..."
+                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-neutral-500 mb-0.5">Longitude</label>
+                  <input
+                    type="text"
+                    name="longitude"
+                    value={formData.longitude}
+                    onChange={handleChange}
+                    placeholder="100.5017..."
+                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
                 หมายเหตุการจัดส่ง
@@ -157,7 +242,7 @@ export default function CustomerSlideOver({ isOpen, onClose, onSave, initialData
             <button
               type="submit"
               disabled={loading}
-              className="w-1/2 flex justify-center items-center  gap-2 px-4 py-2 text-sm font-medium text-white btn-primary rounded-lg transition-colors disabled:opacity-50"
+              className="w-1/2 flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1A1A1A] hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-50"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>{initialData ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูล'}</span>

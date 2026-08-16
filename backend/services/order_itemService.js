@@ -1,6 +1,7 @@
 const order_itemModel = require('../models/order_itemModel')
 const orderModel = require('../models/orderModel');
 const ApiError = require('../utils/ApiError')
+const productModel = require('../models/productModel');
 
 const updateMultipleItemOrders = async (order_id, items) => {
     return new Promise((resolve, reject) => {
@@ -58,7 +59,15 @@ const updateMultipleItemOrders = async (order_id, items) => {
                                 hasError = true;
                                 return reject(err);
                             }
-                            checkCompletion();
+
+                            // 1.3 ตัดสต็อกสินค้าในคลังสำหรับรายการใหม่
+                            productModel.decreaseStock(product_id, quantity, (err) => {
+                                if (err && !hasError) {
+                                    hasError = true;
+                                    return reject(err);
+                                }
+                                checkCompletion();
+                            });
                         });
                     });
 
@@ -86,6 +95,7 @@ const updateMultipleItemOrders = async (order_id, items) => {
 
                         const oldQuantity = result[0].quantity;
                         const pricePerUnit = unit_price || result[0].unit_price;
+                        const targetProductId = result[0].product_id; // ดึง product_id มาใช้จัดการสต็อก
 
                         if (!pricePerUnit) {
                             hasError = true;
@@ -103,28 +113,49 @@ const updateMultipleItemOrders = async (order_id, items) => {
                                 return reject(err);
                             }
 
-                            // 2.3 จัดการเพิ่ม/ลด ยอดรวมของออเดอร์ตามส่วนต่าง
-                            if (qtyDifference !== 0) {
-                                if (oldQuantity > quantity) {
-                                    orderModel.updateOrder_Decrement(order_id, priceDifference, (err) => {
-                                        if (err && !hasError) {
-                                            hasError = true;
-                                            return reject(err);
-                                        }
-                                        checkCompletion();
-                                    });
+                            // 2.3 ฟังก์ชันจัดการสต็อกตามผลต่าง (qtyDifference)
+                            const updateStockBasedOnDiff = (callback) => {
+                                if (qtyDifference === 0) return callback(null);
+
+                                if (qtyDifference > 0) {
+                                    // สั่งเพิ่มจำนวน -> ตัดสต็อกเพิ่ม
+                                    productModel.decreaseStock(targetProductId, qtyDifference, callback);
                                 } else {
-                                    orderModel.updateOrder_Increment(order_id, priceDifference, (err) => {
-                                        if (err && !hasError) {
-                                            hasError = true;
-                                            return reject(err);
-                                        }
-                                        checkCompletion();
-                                    });
+                                    // ลดจำนวนลง -> คืนสต็อกเข้าคลัง
+                                    productModel.increaseStock(targetProductId, Math.abs(qtyDifference), callback);
                                 }
-                            } else {
-                                checkCompletion();
-                            }
+                            };
+
+                            // สั่งอัปเดตสต็อกตามส่วนต่างก่อน
+                            updateStockBasedOnDiff((err) => {
+                                if (err && !hasError) {
+                                    hasError = true;
+                                    return reject(err);
+                                }
+
+                                // 2.4 จัดการเพิ่ม/ลด ยอดรวมของออเดอร์ตามส่วนต่าง
+                                if (qtyDifference !== 0) {
+                                    if (oldQuantity > quantity) {
+                                        orderModel.updateOrder_Decrement(order_id, priceDifference, (err) => {
+                                            if (err && !hasError) {
+                                                hasError = true;
+                                                return reject(err);
+                                            }
+                                            checkCompletion();
+                                        });
+                                    } else {
+                                        orderModel.updateOrder_Increment(order_id, priceDifference, (err) => {
+                                            if (err && !hasError) {
+                                                hasError = true;
+                                                return reject(err);
+                                            }
+                                            checkCompletion();
+                                        });
+                                    }
+                                } else {
+                                    checkCompletion();
+                                }
+                            });
                         });
                     });
 

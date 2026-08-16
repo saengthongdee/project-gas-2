@@ -10,7 +10,7 @@ export default function DeliverySlideOver({
   onSuccess,
 }) {
 
-  const { loading: vehiclesLoading, data: vehicleResponse, vehicles: vehicleList } = useVehicles() || {};
+  const { loading: vehiclesLoading, data: vehicleResponse, vehicles: vehicleList ,  refetch } = useVehicles() || {};
   
   const vehicles = Array.isArray(vehicleResponse) 
     ? vehicleResponse 
@@ -30,11 +30,11 @@ export default function DeliverySlideOver({
         order_ids: selectedOrderIds,
       };
 
-      console.log("Submitting Queue Delivery Payload:", payload);
-
       if (typeof onSuccess === 'function') {
-        onSuccess(payload);
+        await onSuccess(payload);
       }
+
+      refetch();
 
       setSelectedOrderIds([]);
       setSelectedVehicleId('');

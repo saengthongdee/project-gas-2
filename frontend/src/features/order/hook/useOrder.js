@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../../api/axiosInstance";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:5000");
 
 export const useOrder = () => {
 
@@ -123,6 +126,25 @@ const createOrder = async (orderData) => {
    useEffect(() => {
     fetchingData();
   }, [fetchingData]);
+
+  useEffect(() => {
+
+    fetchingData();
+
+        socket.on("order_status_update", (updatedOrder) => {
+            setData((prevData) =>
+                prevData.map((order) =>
+                    order.order_id === updatedOrder.order_id
+                        ? { ...order, delivery_status: updatedOrder.status }
+                        : order
+                )
+            );
+        });
+        return () => {
+            socket.off("order_status_update");
+        };
+
+  },[])
 
   return {
     data,

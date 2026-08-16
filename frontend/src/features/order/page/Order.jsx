@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useOrder } from '../hook/useOrder'; // ปรับ Path ตามโครงสร้างโฟลเดอร์จริง
 import OrderSlideOver from '../OrderSlideOver'; // อัปเดต Path ชี้ไปที่ features ใหม่
 import OrderStatusBadge from '../components/OrderStatusBadge';
@@ -68,6 +68,15 @@ const handleSaveOrder = async (payload) => {
         toast.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
 };
+
+  useEffect(() => {
+
+    if(error) {
+       
+      refetch()
+    }
+
+  },[error])
 
 
   const filteredOrders = useMemo(() => { return orders.filter((item) => {

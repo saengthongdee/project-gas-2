@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react'
 import { useCustomer } from '../hooks/useCustomer'
 import CustomerSlideOver from '../CustomerSlideOver'
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Users, Search, MapPin } from 'lucide-react'
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Users, Search, MapPin, ExternalLink } from 'lucide-react'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function Customer() {
   const {
@@ -18,7 +19,6 @@ export default function Customer() {
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // 💡 กรองข้อมูลตามคำค้นหา (ค้นหาจาก ชื่อ, เบอร์โทร, หรือ ที่อยู่)
   const filteredCustomers = useMemo(() => {
     if (!searchTerm.trim()) return customers
     const term = searchTerm.toLowerCase()
@@ -40,11 +40,13 @@ export default function Customer() {
     setIsSlideOverOpen(true)
   }
 
-  const handleSaveCustomer = async (formData) => {
+const handleSaveCustomer = async (formData) => {
     if (selectedCustomer) {
       await updateCustomer(selectedCustomer.customer_id, formData)
+      toast.success(`แก้ไขข้อมูลลูกค้า #${selectedCustomer.customer_id} สำเร็จ`)
     } else {
       await addCustomer(formData)
+      toast.success('เพิ่มลูกค้าใหม่สำเร็จ')
     }
   }
 
@@ -54,8 +56,9 @@ export default function Customer() {
     try {
       setActionLoading(id)
       await deleteCustomer(id)
+      toast.success(`ลบลูกค้า #${name} สำเร็จ`);
     } catch (err) {
-      alert('ไม่สามารถลบข้อมูลได้: ' + (err.response?.data?.message || err.message))
+      toast.error(`เกิดข้อผิดพลาด`);
     } finally {
       setActionLoading(null)
     }
@@ -63,12 +66,12 @@ export default function Customer() {
 
   return (
     <div className="max-w-7xl p-6 mx-auto space-y-6">
+      <Toaster position="top-center" reverseOrder={false} />
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-bold text-[#1A1A1A]">ข้อมูลลูกค้า</h1>
-            {/* 💡 Badge แสดงจำนวนรวมข้างหัวข้อ */}
             <span className="px-2.5 py-0.5 text-xs font-semibold bg-neutral-100 text-neutral-700 border border-neutral-200 rounded-full">
               {customers.length} ราย
             </span>
@@ -86,7 +89,7 @@ export default function Customer() {
         </button>
       </div>
 
-      {/* 💡 Pattern: Stat Cards (สรุปจำนวนลูกค้าและสถิติเบื้องต้น) */}
+      {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm flex items-center gap-4">
           <div className="p-3 bg-neutral-100 rounded-lg text-[#1A1A1A]">
@@ -106,9 +109,9 @@ export default function Customer() {
             <MapPin className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-medium text-neutral-500">ระบุที่อยู่จัดส่งแล้ว</p>
+            <p className="text-xs font-medium text-neutral-500">ระบุพิกัด GPS แล้ว</p>
             <p className="text-2xl font-bold text-[#1A1A1A]">
-              {customers.filter((c) => c.address && c.address.trim() !== '').length}{' '}
+              {customers.filter((c) => c.latitude && c.longitude).length}{' '}
               <span className="text-xs font-normal text-neutral-500">ราย</span>
             </p>
           </div>
@@ -124,7 +127,6 @@ export default function Customer() {
 
       {/* Main Table Container */}
       <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
-        {/* 💡 Toolbar: ค้นหา และ สรุปจำนวนจากการค้นหา */}
         <div className="p-4 border-b border-neutral-200 bg-neutral-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
@@ -162,6 +164,7 @@ export default function Customer() {
                   <th className="py-3.5 px-4">ชื่อลูกค้า / ร้านค้า</th>
                   <th className="py-3.5 px-4">เบอร์โทรศัพท์</th>
                   <th className="py-3.5 px-4">ที่อยู่</th>
+                  <th className="py-3.5 px-4">พิกัด GPS</th>
                   <th className="py-3.5 px-4">หมายเหตุการจัดส่ง</th>
                   <th className="py-3.5 px-4 text-center">จัดการ</th>
                 </tr>
@@ -174,6 +177,22 @@ export default function Customer() {
                     <td className="py-3.5 px-4 text-neutral-600">{customer.phone}</td>
                     <td className="py-3.5 px-4 text-neutral-600 max-w-xs truncate" title={customer.address}>
                       {customer.address || '-'}
+                    </td>
+                    <td className="py-3.5 px-4 text-neutral-600">
+                      {customer.latitude && customer.longitude ? (
+                        <a
+                          href={`https://www.google.com/maps?q=${customer.latitude},${customer.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+                        >
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>ดูแผนที่</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <span className="text-neutral-400 text-xs">- ไม่มีพิกัด -</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 text-neutral-600 max-w-xs truncate" title={customer.delivery_note}>
                       {customer.delivery_note || '-'}

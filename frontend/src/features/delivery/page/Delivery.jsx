@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useDelivery } from '../hook/useDelivery';
 import DeliverySlideOver from '../DeliverySlideOver';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   Clock,
   Package,
@@ -78,16 +79,16 @@ export default function Delivery() {
 
     try {
 
-      console.log("Delivery.jsx received payload:", payload);
-
       const result = await assignVehicle(payload);
 
       if (result?.success) {
 
+        toast.success(`จัดคิวการส่งสำเร็จ`);
         setSelectedOrderIds([]);
         setIsSlideOverOpen(false);
 
       } else {
+        toast.error(`เกิดข้อผิดพลาดในการจัดคิว`)
         alert(result?.error || "เกิดข้อผิดพลาดในการจัดคิวส่ง");
       }
     } catch (err) {
@@ -97,7 +98,7 @@ export default function Delivery() {
 
   return (
     <div className="max-w-7xl min-h-screen p-6 mx-auto space-y-6 bg-gray-50/30 text-gray-800">
-      
+      <Toaster position="top-center" reverseOrder={false} />
       {/* 1. Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
