@@ -1,11 +1,14 @@
-const express =require('express')
-const router =express.Router()
+const express = require("express");
+const router = express.Router();
 
-const{findAllCylinderdeposit,CreateBulkDeposit,updateCylinderdeposit,deleteCylinderdeposit}=require('../controller/cylinderdepositController')
+const {
+  findAllCylinderdeposit,
+  updateCylinderdeposit,
+  deleteCylinderdeposit,
+} = require("../controller/cylinderdepositController");
 
-router.get('/',findAllCylinderdeposit)
-router.post('/',CreateBulkDeposit)
-router.put('/',updateCylinderdeposit)
-router.delete('/:id',deleteCylinderdeposit)
+router.get("/", findAllCylinderdeposit);
+router.put("/:id", updateCylinderdeposit);
+router.delete("/:id", deleteCylinderdeposit);
 
-module.exports=router
+module.exports = router;

@@ -2,6 +2,7 @@ const orderModel = require('../models/orderModel')
 const vihicleModel = require('../models/vehicleModel')
 const items_order = require('../models/order_itemModel')
 const productModel = require('../models/productModel')
+const cylinderDepositModel = require('../models/cylinderdepositModel')
 
 const ApiError =require('../utils/ApiError')
 const authMiddleware =require('../middlewares/authMiddleware')
@@ -33,12 +34,26 @@ const createOrder = async (orderdata) => {
                     if (error) { return fail(error); }
 
                     productModel.updateStock(items, (error) => {
-                        
                         if (error) { return fail(error); }
 
-                        success({
-                            success: true,
-                            message: "create successfully and stock updated"
+                        // เตรียมข้อมูลสำหรับบันทึกถังฝาก (Cylinder Deposit)
+                        const depositData = items.map((item) => [
+                            mainOrderData.customer_id,
+                            item.product_id,
+                            order_id,
+                            item.quantity || item.qty_out || item.qty, // ปรับชื่อ property ของจำนวนสินค้าตามที่คุณส่งมาใน items
+                            0,          // qty_return เริ่มต้นเป็น 0
+                            new Date()  // deposit_date วันที่ปัจจุบัน
+                        ]);
+
+                        // เรียกใช้ฟังก์ชัน bulkCreateDeposite ที่คุณเขียนไว้ใน Model
+                        cylinderDepositModel.bulkCreateDeposite(depositData, (depositError) => {
+                            if (depositError) { return fail(depositError); }
+
+                            success({
+                                success: true,
+                                message: "create successfully, stock updated and cylinder deposit recorded"
+                            });
                         });
                     });
                 });
@@ -46,6 +61,7 @@ const createOrder = async (orderdata) => {
         });
     });
 };
+
 const getAllOrder = async()=>{
     return new Promise((success,fail)=>{
         const fetchOrder = new Promise ((resolve,reject)=>{

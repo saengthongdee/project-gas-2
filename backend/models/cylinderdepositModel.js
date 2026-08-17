@@ -7,19 +7,23 @@ const bulkCreateDeposite = async(cylinderdepositdata,callback)=>{
     `
     db.query(sql,[cylinderdepositdata],callback)
 }
+
 const findAllCylinderdeposit = async(callback)=>{
-    const sql="SELECT * FROM cylinder_deposit"
+    const sql=`select cd.deposit_id , c.customer_name ,cd.product_id, p.product_name , cd.qty_out , cd.qty_return , cd.deposit_date from cylinder_deposit cd
+	join customers c
+		on cd.customer_id = c.customer_id
+			join products p
+				on cd.product_id = p.product_id`
     db.query(sql,callback);
 }
 
-//ต้องแก้ได้แค่ ถังคืนจากลูกค้า
-const updateCylinderdeposit =async(deposit_id,order_id,qty_return,callback)=>{
+const updateCylinderdeposit =async(deposit_id,qty_return,callback)=>{
     const sql=`
     update cylinder_deposit 
     set qty_return =?
-    where deposit_id = ? and order_id = ?
+    where deposit_id = ?
     `
-    db.query(sql,[qty_return,deposit_id,order_id],callback);
+    db.query(sql,[qty_return,deposit_id],callback);
 }
 const deleteCylinderdeposit =async(deposit_id,callback)=>{
     const sql="DELETE from cylinder_deposit where deposit_id= ?"

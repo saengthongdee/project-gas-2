@@ -42,10 +42,14 @@ const findOrderbyStatus = (callback)=>{
 
     const sql =
     `
-        SELECT o.order_id, c.address, o.order_date, o.total_amount, o.delivery_status
+        SELECT o.order_id, c.address, o.order_date, o.total_amount, o.delivery_status , e.name
         FROM orders o
         JOIN customers c
             ON o.customer_id = c.customer_id
+		left join vehicles v
+			on o.vehicle_id = v.vehicle_id
+		left join employees e
+			on v.vehicle_id = e.vehicle_id
         WHERE o.order_date >= NOW() - INTERVAL 7 DAY
         ORDER BY o.order_date DESC;
     `

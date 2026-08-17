@@ -38,7 +38,6 @@ exports.updateOrderVehicle = asyncHandler(async (req, res, next) => {
 
   const { order_ids, vehicle_id } = req.body;
 
-  // ✅ 2. เช็คว่าเป็น Array และไม่เป็นค่าว่าง
   if (!order_ids || !vehicle_id || !Array.isArray(order_ids) || order_ids.length === 0) {
     return next(new ApiError(400, "Missing or invalid required fields: order_ids (array) or vehicle_id"));
   }

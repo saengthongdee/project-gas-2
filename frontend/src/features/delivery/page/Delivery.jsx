@@ -11,8 +11,7 @@ import {
   Search,
   Loader2,
   AlertCircle,
-  Eye,
-  RefreshCw,
+  User,
   Send,
 } from "lucide-react";
 
@@ -24,7 +23,7 @@ const STATUS_MAP = {
 };
 
 export default function Delivery() {
-  const { loading, error, data: orders, fetchingData ,assignVehicle } = useDelivery();
+  const { loading, error, data: orders, fetchingData, assignVehicle } = useDelivery();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -34,7 +33,10 @@ export default function Delivery() {
   const filteredOrders = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     return (orders || []).filter((item) => {
-      const matchesSearch = !term || item.order_id?.toString().toLowerCase().includes(term);
+      const driverName = item.name || item.driver_name || '';
+      const matchesSearch = !term || 
+        item.order_id?.toString().toLowerCase().includes(term) ||
+        driverName.toLowerCase().includes(term);
       const matchesStatus = selectedStatus === 'all' || item.delivery_status === selectedStatus;
       return matchesSearch && matchesStatus;
     });
@@ -76,19 +78,15 @@ export default function Delivery() {
   }, [selectableOrdersInFilter, selectedOrderIds]);
 
   const handleAssignQueue = async (payload) => {
-
     try {
-
       const result = await assignVehicle(payload);
 
       if (result?.success) {
-
         toast.success(`จัดคิวการส่งสำเร็จ`);
         setSelectedOrderIds([]);
         setIsSlideOverOpen(false);
-
       } else {
-        toast.error(`เกิดข้อผิดพลาดในการจัดคิว`)
+        toast.error(`เกิดข้อผิดพลาดในการจัดคิว`);
         alert(result?.error || "เกิดข้อผิดพลาดในการจัดคิวส่ง");
       }
     } catch (err) {
@@ -99,6 +97,7 @@ export default function Delivery() {
   return (
     <div className="max-w-7xl min-h-screen p-6 mx-auto space-y-6 bg-gray-50/30 text-gray-800">
       <Toaster position="top-center" reverseOrder={false} />
+      
       {/* 1. Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -111,9 +110,9 @@ export default function Delivery() {
           <button
             onClick={() => setIsSlideOverOpen(true)}
             disabled={selectedOrderIds.length === 0}
-            className={`px-4 py-2.5 font-medium text-sm rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto ${
+            className={`px-4 py-2.5 font-medium text-sm rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer ${
               selectedOrderIds.length > 0
-                ? 'bg-[#0B192C] hover:bg-[#1E3E62] text-white cursor-pointer'
+                ? 'bg-[#0B192C] hover:bg-[#1E3E62] text-white'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -183,7 +182,7 @@ export default function Delivery() {
             <div className="relative w-full sm:w-80">
               <input
                 type="text"
-                placeholder="ค้นหารหัสออเดอร์..."
+                placeholder="ค้นหารหัสออเดอร์ หรือชื่อผู้จัดส่ง..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#373737] placeholder-gray-400"
@@ -231,7 +230,7 @@ export default function Delivery() {
         ) : filteredOrders.length === 0 ? (
           <div className="p-12 text-center text-gray-400 text-sm">ไม่พบรายการจัดส่งที่ค้นหา</div>
         ) : (
-          <div className="overflow-x-auto max-h-[52vh] custom-scrollbar">
+          <div className="overflow-x-auto max-h-[55vh] custom-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#F5F8FB] border-b border-neutral-200 text-xs font-semibold text-[#545454] uppercase tracking-wider">
@@ -245,10 +244,11 @@ export default function Delivery() {
                     />
                   </th>
                   <th className="py-3.5 px-4">#</th>
-                  <th className="py-3.5 px-4">รหัสออเดอร์</th>
+                  
                   <th className="py-3.5 px-4">ที่อยู่</th>
                   <th className="py-3.5 px-4 text-right">วันที่สั่งซื้อ</th>
                   <th className="py-3.5 px-4 text-right">ยอดรวม (บาท)</th>
+                  <th className="py-3.5 px-4 text-right">ชื่อผู้จัดส่ง</th>
                   <th className="py-3.5 px-4 text-center">สถานะการจัดส่ง</th>
                 </tr>
               </thead>
@@ -260,6 +260,9 @@ export default function Delivery() {
                     bg: 'bg-gray-100 text-gray-600 border-gray-200',
                   };
                   const isDisableSelect = order.delivery_status !== 'pending';
+
+                  // ดึงค่าชื่อผู้จัดส่งจากฟิลด์ name
+                  const driverName = order.name;
 
                   return (
                     <tr
@@ -281,8 +284,9 @@ export default function Delivery() {
                       </td>
 
                       <td className="py-3.5 px-4 text-gray-600">{index + 1}</td>
-                      <td className="py-3.5 px-4 font-semibold text-gray-900">#{order.order_id}</td>
+                      
                       <td className="py-3.5 px-4 text-gray-600">{order.address || '-'}</td>
+                      
                       <td className="py-3.5 px-4 text-right text-gray-600">
                         {order.order_date ? new Date(order.order_date).toLocaleDateString('th-TH', {
                           year: 'numeric',
@@ -290,12 +294,30 @@ export default function Delivery() {
                           day: '2-digit',
                         }) : '-'}
                       </td>
+                      
                       <td className="py-3.5 px-4 text-right font-medium text-gray-900">
                         {Number(order.total_amount || 0).toLocaleString('th-TH', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
                       </td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex flex-row justify-end gap-1">
+                          {driverName ? (
+                            <div className="flex items-center  justify-end gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold text-neutral-700">
+                                <User className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
+                                {driverName}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="inline-flex  justify-end items-center px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-400 w-fit">
+                              ยังไม่ระบุผู้จัดส่ง
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
                       <td className="py-3.5 px-4 text-center">
                         <span className={`inline-block px-2.5 py-1 text-xs font-medium rounded-md border ${statusInfo.bg}`}>
                           {statusInfo.label}
