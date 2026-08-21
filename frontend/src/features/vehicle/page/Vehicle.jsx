@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useVehicles } from "../hook/useVehicle";
 import { useVehicleBrands } from "../../vehiclebrand/hook/useVehicleBrand";
 import VehicleSlideOver from "../VehicleSlideOver";
+import toast, { Toaster } from "react-hot-toast";
 import { 
   Plus, 
   Pencil, 
@@ -77,10 +78,17 @@ export default function Vehicles() {
   };
 
   const handleSave = async (formData) => {
-    if (selectedVehicle) {
-      await updateVehicle(selectedVehicle.vehicle_id, formData);
-    } else {
-      await addVehicle(formData);
+    try {
+      if (selectedVehicle) {
+        await updateVehicle(selectedVehicle.vehicle_id, formData);
+        toast.success("อัปเดตข้อมูลรถสำเร็จ");
+      } else {
+        await addVehicle(formData);
+        toast.success("เพิ่มรถใหม่สำเร็จ");
+      }
+    } catch (err) {
+      toast.error("เกิดข้อผิดพลาด: " + (err.response?.data?.message || err.message));
+      throw err; // ส่ง error กลับไปให้ SlideOver จัดการต่อถ้าจำเป็น
     }
   };
 
@@ -90,8 +98,9 @@ export default function Vehicles() {
     try {
       setActionLoading(id);
       await deleteVehicle(id);
+      toast.success(`ลบรถทะเบียน "${licensePlate}" สำเร็จ`);
     } catch (err) {
-      alert("ไม่สามารถลบข้อมูลได้: " + (err.response?.data?.message || err.message));
+      toast.error("ไม่สามารถลบข้อมูลได้: " + (err.response?.data?.message || err.message));
     } finally {
       setActionLoading(null);
     }
@@ -99,6 +108,9 @@ export default function Vehicles() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Toast Container */}
+      <Toaster position="top-center" reverseOrder={false} />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

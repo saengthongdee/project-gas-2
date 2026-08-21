@@ -12,6 +12,7 @@ import Security from '../features/security/page/Security'
 import Order from '../features/order/page/Order'
 import Delivery from '../features/delivery/page/Delivery'
 import Cylinderdeposit from '../features/cylinderdeposit/page/Cylinderdeposit'
+import History from '../features/history/page/History'
 
 const ProtectedRoute = ({ children }) => {
 
@@ -71,6 +72,9 @@ const router = createBrowserRouter([
             },
             {
                 path: '/cylinderdeposit' , element: <Cylinderdeposit/>
+            },
+            {
+                path: '/history' , element: <History/>
             }
         ]
     },

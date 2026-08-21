@@ -295,7 +295,7 @@ export default function Delivery() {
                         }) : '-'}
                       </td>
                       
-                      <td className="py-3.5 px-4 text-right font-medium text-gray-900">
+                      <td className="py-3.5 px-4 text-right font-bold text-sky-700">
                         {Number(order.total_amount || 0).toLocaleString('th-TH', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,

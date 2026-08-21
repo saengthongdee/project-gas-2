@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Truck, Loader2, Save, X as CloseIcon } from "lucide-react";
+import { Truck, Loader2, X as CloseIcon } from "lucide-react";
 import { useVehicleBrands } from "../vehiclebrand/hook/useVehicleBrand";
 
 const INITIAL_FORM = {
   license_plate: "",
   brand_id: "",
   capacity_kg: "",
-  status: "available", // Default เป็น available เสมอ
+  status: "available", // ค่าเริ่มต้นเป็น available
 };
 
 export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData }) {
@@ -83,7 +83,7 @@ export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData 
     >
       {/* Backdrop (Fade In / Out) */}
       <div
-        className={`fixed inset-0 bg-black/40  transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 bg-black/40 transition-opacity duration-300 ease-in-out ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}
@@ -108,7 +108,7 @@ export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData 
                 </h2>
                 <p className="text-xs text-neutral-500">
                   {initialData
-                    ? "อัปเดตรายละเอียดรถ"
+                    ? "อัปเดตรายละเอียดและสถานะรถ"
                     : "ลงทะเบียนยานพาหนะเข้าสู่ระบบ"}
                 </p>
               </div>
@@ -162,7 +162,8 @@ export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData 
                 required
                 disabled={loadingBrands}
                 className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1A1A1A] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1A1A1A] transition-all disabled:opacity-50"
-              ><option value="">-- เลือกรุ่น/ยี่ห้อรถ --</option>
+              >
+                <option value="">-- เลือกรุ่น/ยี่ห้อรถ --</option>
                 {brands.map((b) => (
                   <option key={b.brand_id} value={b.brand_id}>
                     {b.brand_type}
@@ -171,7 +172,7 @@ export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData 
               </select>
             </div>
 
-            {/* ความจุ / น้ำหนักบรรทุกสูงสุด (กก.) */}
+            {/* น้ำหนักบรรทุกสูงสุด (กก.) */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-neutral-700">
                 น้ำหนักบรรทุกสูงสุด (กิโลกรัม)
@@ -185,6 +186,24 @@ export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData 
                 onChange={handleChange}
                 className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1A1A1A] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1A1A1A] transition-all"
               />
+            </div>
+
+            {/* สถานะรถ (เพิ่มใหม่) */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-700">
+                สถานะรถ <span className="text-rose-500">*</span>
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                required
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-[#1A1A1A] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1A1A1A] transition-all"
+              >
+                <option value="available">พร้อมใช้งาน (Available)</option>
+                <option value="in_use">กำลังส่งของ (In Use)</option>
+                <option value="maintenance">ซ่อมบำรุง (Maintenance)</option>
+              </select>
             </div>
           </form>
 
@@ -204,13 +223,9 @@ export default function VehicleSlideOver({ isOpen, onClose, onSave, initialData 
               className="w-1/2 flex justify-center items-center gap-2 bg-[#0B192C] hover:bg-[#1E3E62] text-white px-5 py-2.5 rounded-lg text-xs font-semibold transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
             >
               {submitting ? (
-                <>
-                  <span>กำลังบันทึก...</span>
-                </>
+                <span>กำลังบันทึก...</span>
               ) : (
-                <>
-                  <span>บันทึกข้อมูล</span>
-                </>
+                <span>บันทึกข้อมูล</span>
               )}
             </button>
           </div>

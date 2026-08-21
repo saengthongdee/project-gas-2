@@ -17,7 +17,8 @@ import {
   Bike,
   Bus,
   Lock,
-  Settings
+  Settings,
+  History
 } from "lucide-react";
 
 // กำหนด roles ที่มีสิทธิ์เห็นแต่ละเมนู ([1] = เจ้าของ, [2] = แอดมิน)
@@ -55,7 +56,6 @@ const menuSections = [
     category: "บิล / การค้างถัง",
     collapsible: true,
     items: [
-      { title: "บิลรายการออเดอร์", path: "/bills/orders", icon: Receipt, roles: [1, 2] },
       { title: "บิลถังซ่อม", path: "/bills/maintenance", icon: Wrench, roles: [1] },
       { title: "บิลถังบรรจุ", path: "/bills/filling", icon: Flame, roles: [1] },
       { title: "รายการถังค้าง", path: "/cylinderdeposit", icon: ClipboardList, roles: [1] },
@@ -69,6 +69,7 @@ const menuSections = [
       { title: "รายการยานพาหนะ", path: "/vehicles", icon: Bike, roles: [1, 2] },
       { title: "ข้อมูลยานพาหนะ", path: "/vehiclebrand", icon: Bus, roles: [1, 2] },
       { title: "จัดการรหัสผ่าน", path: "/security", icon: Lock, roles: [1] },
+      { title: "ประวัติการสั่งซื้อ", path: "/history", icon: History, roles: [1, 2] },
     ],
   }
 ];

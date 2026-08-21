@@ -16,7 +16,6 @@ const db = require('./configs/db')
 const notfound = require('./middlewares/notfound')
 const errorHandler = require('./middlewares/errorHandler')
 
-
 //routes 
 const authRouter =require('./routers/authRouter')
 const customerRouter =require('./routers/customerRouter')
@@ -29,6 +28,7 @@ const cylinderdepositRouter=require('./routers/cylinderdepositRouter')
 const order_itemRouter =require('./routers/order_itemRoute')
 const fillingorderRouter =require('./routers/fillingorderRouter')
 const maintenenceRouter =require('./routers/maintenenceRouter')
+const historyOrderRouter = require('./routers/historyOrderRouter')
 
 //กำหนดชื่อ api
 app.use('/api/auth',authRouter)
@@ -42,6 +42,7 @@ app.use('/api/cylinderdeposit',cylinderdepositRouter)
 app.use('/api/order_item',order_itemRouter)
 app.use('/api/fillingorder',fillingorderRouter)
 app.use('/api/maintenence',maintenenceRouter)
+app.use('/api/historyOrder', historyOrderRouter)
 
 app.use(notfound)
 app.use(errorHandler)

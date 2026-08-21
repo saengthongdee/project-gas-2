@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../../api/axiosInstance";
+import { socket } from "../../../utils/socket";
 
 export const useVehicles = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [vehicles, setVehicles] = useState([]);
-  const [unassignedVehicles, setUnassignedVehicles] = useState([]); // เปลี่ยนชื่อให้อ่านเข้าใจง่ายขึ้น
+  const [unassignedVehicles, setUnassignedVehicles] = useState([]);
 
   // ดึงข้อมูลรถทั้งหมด
   const fetchVehicles = useCallback(async () => {
@@ -37,7 +38,7 @@ export const useVehicles = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // <--- เพิ่ม [] ตรงนี้ที่ตกไป
+  }, []);
 
   // รวมฟังก์ชันเรียกโหลดข้อมูลทั้งคู่พร้อมกัน
   const fetchAllData = useCallback(async () => {
@@ -63,9 +64,35 @@ export const useVehicles = () => {
     return res.data;
   };
 
+  // โหลดข้อมูลครั้งแรกเมื่อเปิดใช้งาน Hook
   useEffect(() => {
     fetchAllData();
   }, [fetchAllData]);
+
+  // 🟢 ฟัง Socket.io แบบ Global สำหรับอัปเดตสถานะรถ
+  useEffect(() => {
+    socket.on("vehicle_status_update", (updatedVehicle) => {
+      setVehicles((prevVehicles) =>
+        prevVehicles.map((vehicle) =>
+          Number(vehicle.vehicle_id || vehicle.id) === Number(updatedVehicle.vehicle_id)
+            ? { ...vehicle, status: updatedVehicle.status }
+            : vehicle
+        )
+      );
+
+      setUnassignedVehicles((prevUnassigned) =>
+        prevUnassigned.map((vehicle) =>
+          Number(vehicle.vehicle_id || vehicle.id) === Number(updatedVehicle.vehicle_id)
+            ? { ...vehicle, status: updatedVehicle.status }
+            : vehicle
+        )
+      );
+    });
+
+    return () => {
+      socket.off("vehicle_status_update");
+    };
+  }, []);
 
   return {
     vehicles,

@@ -1,6 +1,6 @@
 const fillingorderModel = require('../models/fillingorderModel')
 const ApiError=require('../utils/ApiError')
-const { updateCustomer } = require('./customerService')
+// const { updateCustomer } = require('./customerService')
 
 const findAllFillingorder =async()=>{
     return new Promise((success,fail)=>{
@@ -57,6 +57,5 @@ const deleteFillingorder =async(fillmg_order_id)=>{
 module.exports={
     findAllFillingorder,
     createFillingorder,
-    updateCustomer,
     deleteFillingorder
 }

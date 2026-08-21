@@ -28,7 +28,7 @@ export default function Employees() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 💡 กรองข้อมูลพนักงานจากคำค้นหา (ชื่อ, เบอร์โทร, อีเมล, ตำแหน่ง, ทะเบียนรถ)
+  // 💡 กรองข้อมูลพนักงานจากคำค้นหา (ชื่อ, เบอร์โทร, อีเมล, ตำแหน่ง, ทะเบียนรถ, สถานะ)
   const filteredEmployees = useMemo(() => {
     if (!searchTerm.trim()) return employees;
     const term = searchTerm.toLowerCase();
@@ -38,7 +38,8 @@ export default function Employees() {
         e.phone?.includes(term) ||
         e.email?.toLowerCase().includes(term) ||
         e.role_name?.toLowerCase().includes(term) ||
-        e.license_plate?.toLowerCase().includes(term)
+        e.license_plate?.toLowerCase().includes(term) ||
+        e.status?.toLowerCase().includes(term)
     );
   }, [employees, searchTerm]);
 
@@ -94,7 +95,6 @@ export default function Employees() {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-bold text-[#1A1A1A]">ข้อมูลพนักงาน</h1>
-            {/* 💡 Title Badge แสดงจำนวนรวม */}
             <span className="px-2.5 py-0.5 text-xs font-semibold bg-neutral-100 text-neutral-700 border border-neutral-200 rounded-full">
               {employees.length} คน
             </span>
@@ -114,7 +114,7 @@ export default function Employees() {
         </button>
       </div>
 
-      {/* 💡 Pattern: Stat Cards (สรุปจำนวนพนักงานและสถิติการใช้งาน) */}
+      {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm flex items-center gap-4">
           <div className="p-3 bg-neutral-100 rounded-lg text-[#1A1A1A]">
@@ -166,13 +166,12 @@ export default function Employees() {
 
       {/* Table Section */}
       <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
-        {/* 💡 Toolbar: Search & Count Status */}
         <div className="p-4 border-b border-neutral-200 bg-neutral-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
             <input
               type="text"
-              placeholder="ค้นหาชื่อ, เบอร์, ตำแหน่ง, ทะเบียน..."
+              placeholder="ค้นหาชื่อ, เบอร์, ตำแหน่ง, ทะเบียน, สถานะ..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-3 py-1.5 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#5b5b5b] text-[#1A1A1A]"
@@ -206,6 +205,7 @@ export default function Employees() {
                   <th className="py-3.5 px-4">เบอร์โทรศัพท์</th>
                   <th className="py-3.5 px-4">อีเมล</th>
                   <th className="py-3.5 px-4">ทะเบียน / ยี่ห้อรถ</th>
+                  <th className="py-3.5 px-4">สถานะ</th>
                   <th className="py-3.5 px-4 text-center">จัดการ</th>
                 </tr>
               </thead>
@@ -230,6 +230,17 @@ export default function Employees() {
                       ) : (
                         <span className="text-neutral-400 text-xs">-</span>
                       )}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                          employee.status === "active"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-neutral-100 text-neutral-600 border border-neutral-200"
+                        }`}
+                      >
+                        {employee.status === "active" ? "Active" : employee.status || "Inactive"}
+                      </span>
                     </td>
                     <td className="py-3.5 px-4 text-center">
                       <div className="flex items-center justify-center gap-1.5">

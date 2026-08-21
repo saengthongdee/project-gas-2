@@ -3,7 +3,7 @@ const db=require('../configs/db')
 const findAllEmployee =async(callback)=>{
     const sql =
         `
-        select e.employee_id , e.name , e.phone , e.email , r.role_name , v.license_plate , vb.brand_type from employees e 
+        select e.employee_id , e.name , e.phone , e.email , r.role_name, e.status , v.license_plate , vb.brand_type from employees e 
 	        left join roles r 
 		        on e.role_id = r.role_id
 			        left join vehicles v
@@ -36,11 +36,18 @@ const ChangPassword = async(employee_id , newPassword , callback) => {
 
     db.query(sql , [newPassword , employee_id] , callback)
 }
+const findEmployeeStatus = (employee_id , callback) => {
+
+    const sql = "select status from employees where employee_id = ?"
+
+    db.query(sql , employee_id , callback)
+} 
 
 module.exports={
     findAllEmployee,
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    ChangPassword
+    ChangPassword,
+    findEmployeeStatus
 }

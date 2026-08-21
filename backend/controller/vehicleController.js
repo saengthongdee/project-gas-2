@@ -40,3 +40,22 @@ exports.findVehicleISNull = asyncHandler(async(req,res,next)=>{
     res.status(200).json(result);
     
 })
+exports.updateVehicleStatus = asyncHandler(async(req , res ,next) => {
+
+    const {id} = req.params
+
+    if(!id) {return next(new ApiError(400, "id is required"))}
+
+    const result = await vehicleService.updateVehicleStatus(id)
+
+    const io = req.app.get('io')
+    
+    if(io) {
+        io.emit('vehicle_status_update' , {
+            vehicle_id: Number(id),
+            status : 'available',
+        })
+    }
+
+    res.status(200).json(result)
+})

@@ -135,8 +135,8 @@ export default function DeliverySlideOver({
 
                   <div>
                     {!isAvailable ? (
-                      <span className="text-xs font-medium text-rose-500 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">
-                        ไม่พร้อมใช้งาน
+                      <span className="text-xs font-medium text-rose-500  px-2.5">
+                        <div className='w-4 h-4 border rounded-full bg-red-500'></div>
                       </span>
                     ) : (
                       <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${

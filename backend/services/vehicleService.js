@@ -72,11 +72,27 @@ const findVehicleISNull = async() => {
         })
     })
 }
+const updateVehicleStatus = (vehicle_id) => {
+
+    return new Promise((success , fail) => {
+
+        vehicleModel.updateVehicleStatus(vehicle_id , "available",(err , result) => {
+
+            if(err) {return fail(err)}
+
+            success({
+                success: true,
+                messageL: "updatevehiclestatus successfully"
+            })
+        })
+    })
+}
 
 module.exports={
     findAllVehicle,
     createVehicle,
     updateVehicle,
     findVehicleISNull,
-    deleteVehicle
+    deleteVehicle,
+    updateVehicleStatus
 }

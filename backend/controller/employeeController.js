@@ -46,3 +46,13 @@ exports.ChangPassword = asyncHandler(async(req , res, next) => {
 
     res.status(200).json(result)
 })
+exports.findEmployeeStatus = asyncHandler(async(req , res , next) => {
+
+    const {id} = req.params
+
+    if(!id){ return next(new ApiError(400,"id is required"))}
+
+    const result = await employeeService.findEmployeeStatus(id)
+
+    res.status(200).json(result)
+})

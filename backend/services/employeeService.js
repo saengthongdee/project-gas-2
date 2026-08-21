@@ -55,6 +55,20 @@ const deleteEmployee = async(employee_id)=>{
         })
     })
 }
+const findEmployeeStatus = async(employee_id) => {
+
+    return new Promise((success , fail) => {
+        employeeModel.findEmployeeStatus(employee_id,(err , result) => {
+            if(err) {return fail(err)}
+
+            success({
+                success: true,
+                message: "fetching status successfully",
+                ...result[0]
+            })
+        })
+    })
+}
 
 const ChangPassword = async (newPassword, employee_id) => {
     try {
@@ -65,9 +79,6 @@ const ChangPassword = async (newPassword, employee_id) => {
                 if (err) {
                     return fail(err);
                 }
-                console.log("emp_id :" , employee_id)
-
-                console.log("MySQL Result:", result);
 
                 success({
                     success: true,
@@ -85,5 +96,6 @@ module.exports={
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    ChangPassword
+    ChangPassword,
+    findEmployeeStatus
 }

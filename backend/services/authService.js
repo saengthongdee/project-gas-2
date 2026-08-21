@@ -45,7 +45,9 @@ const login =async (email,password )=>{
                 token: token,
                 role_ID: roleValue,
                 employee_name: user.name,
-                vehicle_id : user.vehicle_id
+                vehicle_id : user.vehicle_id,
+                status: user.status,
+                employee_id: user.employee_id
             })
 
             })
