@@ -9,10 +9,10 @@ const {
   deleteOrders,
   findOrderbyStatus,
   updateOrderVehicle,
-  updateOrderStatus,
   findOrdertodayByVehicle,
   findOneOrder,
-  uploadImage
+  uploadImage,
+  cancelOrder
 } = require("../controller/orderController");
 
 //router.use(authMiddleware)
@@ -25,5 +25,6 @@ router.put("/delivery", updateOrderVehicle);
 router.get('/driver/:id' , findOrdertodayByVehicle)
 router.get('/subdetail/:id' , findOneOrder)
 router.put('/upload/:order_id', uploadImage);
+router.put('/:id/cancel', cancelOrder)
 
 module.exports = router;

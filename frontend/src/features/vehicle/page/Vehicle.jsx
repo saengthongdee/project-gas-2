@@ -12,7 +12,8 @@ import {
   Truck, 
   CheckCircle2, 
   Clock, 
-  Wrench 
+  Wrench,
+  UserX
 } from "lucide-react";
 
 export default function Vehicles() {
@@ -38,7 +39,21 @@ export default function Vehicles() {
     return brand ? brand.brand_type : `ยี่ห้อ ID: ${brandId}`;
   };
 
-  const renderStatusBadge = (status) => {
+  // 💡 ปรับปรุงฟังก์ชันเช็คสถานะและพนักงาน
+  const renderStatusBadge = (vehicle) => {
+    const status = vehicle.status;
+    const hasEmployee = vehicle.employee_id || vehicle.employee || vehicle.employee_name;
+
+    // ถ้าสถานะว่าง/พร้อมใช้งาน แต่ยังไม่มีพนักงาน
+    if (status === "available" && !hasEmployee) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
+          <UserX className="w-3 h-3 text-neutral-400" />
+          ไม่มีพนักงาน
+        </span>
+      );
+    }
+
     switch (status) {
       case "available":
         return (
@@ -88,7 +103,7 @@ export default function Vehicles() {
       }
     } catch (err) {
       toast.error("เกิดข้อผิดพลาด: " + (err.response?.data?.message || err.message));
-      throw err; // ส่ง error กลับไปให้ SlideOver จัดการต่อถ้าจำเป็น
+      throw err; 
     }
   };
 
@@ -238,7 +253,7 @@ export default function Vehicles() {
                     <td className="py-3.5 px-4 font-mono text-neutral-700">
                       {v.capacity_kg ? `${v.capacity_kg.toLocaleString()} กก.` : "-"}
                     </td>
-                    <td className="py-3.5 px-4">{renderStatusBadge(v.status)}</td>
+                    <td className="py-3.5 px-4">{renderStatusBadge(v)}</td>
                     <td className="py-3.5 px-4 text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         <button

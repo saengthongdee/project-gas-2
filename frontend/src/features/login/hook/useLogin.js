@@ -21,6 +21,7 @@ export const useLogin = () => {
             setError(null)
 
             const response = await axiosInstance.post('/auth/login', { email, password })
+
             const { token } = response.data;
             const { role_ID } = response.data;
             const { employee_name } = response.data;

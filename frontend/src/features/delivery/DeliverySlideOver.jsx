@@ -42,6 +42,9 @@ export default function DeliverySlideOver({
       
     } catch (err) {
       console.error("Failed to assign queue:", err);
+      // 💡 ดึงข้อความแจ้งเตือนจาก Backend มาแสดงให้ผู้ใช้รู้
+      const errorMessage = err.response?.data?.message || "เกิดข้อผิดพลาดในการจัดคิว";
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +86,7 @@ export default function DeliverySlideOver({
         {/* Body */}
         <div className="flex-1 p-6 space-y-3 overflow-y-auto min-h-0">
           <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider block mb-2">
-            พาหนะที่พร้อมใช้งาน ({vehicles.filter(v => v.status === 'available').length})
+            พาหนะที่พร้อมใช้งาน ({vehicles.filter(v => v.status === 'available' && v.employee_id !== null).length})
           </label>
 
           {vehiclesLoading ? (
@@ -101,7 +104,10 @@ export default function DeliverySlideOver({
               const brandType = vehicle.brand_type;
               const licensePlate = vehicle.license_plate;
               const capacityKg = vehicle.capacity_kg;
-              const isAvailable = vehicle.status === 'available';
+              
+              // 💡 เช็คทั้งสถานะรถและตรวจสอบว่ามีพนักงานผูกอยู่หรือไม่ (employee_id ไม่เป็น null)
+              const hasEmployee = vehicle.employee_id !== null && vehicle.employee_id !== undefined;
+              const isAvailable = vehicle.status === 'available' && hasEmployee;
               const isSelected = selectedVehicleId === vehicleId;
 
               return (
@@ -135,8 +141,14 @@ export default function DeliverySlideOver({
 
                   <div>
                     {!isAvailable ? (
-                      <span className="text-xs font-medium text-rose-500  px-2.5">
-                        <div className='w-4 h-4 border rounded-full bg-red-500'></div>
+                      <span className="text-xs font-medium text-rose-500 px-2.5">
+                        {!hasEmployee ? (
+                          <span className="text-[11px] bg-rose-50 text-rose-600 px-2 py-1 rounded-md border border-rose-200 whitespace-nowrap">
+                            ยังไม่ระบุพนักงาน
+                          </span>
+                        ) : (
+                          <div className='w-4 h-4 border rounded-full bg-red-500'></div>
+                        )}
                       </span>
                     ) : (
                       <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${

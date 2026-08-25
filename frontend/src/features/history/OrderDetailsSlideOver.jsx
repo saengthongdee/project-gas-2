@@ -12,6 +12,24 @@ import {
 export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
   const safeOrder = order || {};
 
+  // 💡 ฟังก์ชันแปลงสถานะเป็นภาษาไทยและกำหนดสีป้ายสถานะ
+  const getDeliveryStatusConfig = (status) => {
+    switch (status?.toLowerCase()) {
+      case "delivered":
+        return { text: "จัดส่งสำเร็จ", className: "bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full" };
+      case "delivering":
+        return { text: "กำลังจัดส่ง", className: "bg-blue-50 text-blue-700 border border-blue-200 rounded-full" };
+      case "pending":
+        return { text: "รอดำเนินการ", className: "bg-amber-50 text-amber-700 border border-amber-200 rounded-full" };
+      case "cancelled":
+        return { text: "ยกเลิก", className: "bg-rose-50 text-rose-700 border border-rose-200 rounded-full" };
+      default:
+        return { text: status || "-", className: "bg-neutral-50 text-neutral-700 border border-neutral-200 rounded-full" };
+    }
+  };
+
+  const statusConfig = getDeliveryStatusConfig(safeOrder.delivery_status);
+
   return (
     <>
       {/* Backdrop */}
@@ -44,7 +62,7 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -53,23 +71,19 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Status & Payment Info */}
-          <div className="grid grid-cols-2  gap-4 p-4 bg-neutral-50 border  border-neutral-200 rounded-xl">
-            <div className="border-r-2 border-gray-300">
-              <span className="text-xs text-neutral-500 block mb-1">
+          <div className="grid grid-cols-2 gap-4 p-4 bg-neutral-50 border border-neutral-200 rounded-xl items-center">
+            <div className="border-r border-neutral-200 pr-4">
+              <span className="text-xs text-neutral-500 block mb-1.5">
                 สถานะการจัดส่ง
               </span>
               <span
-                className={`inline-flex items-center px-2.5 py-1 text-xs font-medium ${
-                  safeOrder.delivery_status === "delivered"
-                    ? " text-emerald-700"
-                    : " text-amber-700"
-                }`}
+                className={`inline-flex items-center px-2.5 py-1 text-xs font-medium border ${statusConfig.className}`}
               >
-                {safeOrder.delivery_status || "-"}
+                {statusConfig.text}
               </span>
             </div>
             <div>
-              <span className="text-xs text-neutral-500 block mb-1">
+              <span className="text-xs text-neutral-500 block mb-1.5">
                 วิธีชำระเงิน
               </span>
               <span className="text-sm font-medium text-[#1A1A1A] uppercase flex items-center gap-1.5">
@@ -124,7 +138,7 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
                     key={idx}
                     className="p-3.5 flex items-center justify-between text-sm hover:bg-neutral-50/50"
                   >
-                    <div className="flex flex-col  gap-1">
+                    <div className="flex flex-col gap-1">
                       <div className="font-medium text-[#1A1A1A]">
                         {item.product_name}
                       </div>
@@ -189,7 +203,7 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
         </div>
 
         {/* Footer Summary */}
-        <div className="p-6 border-t  border-neutral-200 bg-neutral-50 flex items-center justify-between shrink-0">
+        <div className="p-6 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between shrink-0">
           <div>
             <span className="text-neutral-800 font-bold">
               ยอดรวมทั้งสิ้น

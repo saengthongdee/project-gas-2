@@ -15,6 +15,25 @@ const historyOrder = (callback) => {
     db.query(sql , callback)
 }
 
+const createFulfillmentLog = (fulfillmentLogData , callback) => {
+
+    const sql = 
+    `
+        insert into order_fulfillment_log set ? 
+    `
+
+    db.query(sql , fulfillmentLogData , callback)
+}
+
+const updatVehiclenameByName = (order_id ,employee_name, callback) => {
+
+    const sql = "update order_fulfillment_log set employee_name = ? where order_id = ?"
+
+    db.query(sql , [employee_name , order_id], callback)
+}
+
 module.exports = {
-    historyOrder
+    historyOrder,
+    createFulfillmentLog,
+    updatVehiclenameByName
 } 

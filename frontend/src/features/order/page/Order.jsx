@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 export default function Order() {
-  const { data: orders = [], loading, error, createOrder, updateOrderItems , refetch , deleteOrder , deleteOrderItem } = useOrder();
+  const { data: orders = [], loading, error, createOrder, updateOrderItems, refetch, cancelOrder, deleteOrderItem } = useOrder();
 
   // State สำหรับ SlideOver & Modal Mode (เพิ่ม/ดูรายละเอียดออเดอร์)
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
@@ -31,7 +31,7 @@ export default function Order() {
   // State สำหรับ Search & Filter
   const [searchTerm, setSearchTerm] = useState('');
 
-const handleSaveOrder = async (payload) => {
+  const handleSaveOrder = async (payload) => {
     console.log("Payload to save:", payload);
 
     try {
@@ -67,19 +67,16 @@ const handleSaveOrder = async (payload) => {
         console.error("เกิดข้อผิดพลาดในการบันทึกออเดอร์:", err);
         toast.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
-};
+  };
 
   useEffect(() => {
-
     if(error) {
-       
-      refetch()
+      refetch();
     }
+  }, [error]);
 
-  },[error])
-
-
-  const filteredOrders = useMemo(() => { return orders.filter((item) => {
+  const filteredOrders = useMemo(() => { 
+    return orders.filter((item) => {
       const matchesSearch = 
         item.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.employee_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -88,9 +85,7 @@ const handleSaveOrder = async (payload) => {
     });
   }, [orders, searchTerm]);
 
-
   const stats = useMemo(() => {
-
     const totalCount = orders.length;
     const totalRevenue = orders.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0);
     const totalItemsCount = orders.reduce((sum, order) => {
@@ -99,44 +94,41 @@ const handleSaveOrder = async (payload) => {
     }, 0);
 
     return { totalCount, totalRevenue, totalItemsCount };
-
   }, [orders]);
 
-  const handleDeleteOrder = async (id) => {
-    if (window.confirm(`คุณต้องการลบออเดอร์ ID: ${id} ใช่หรือไม่?`)) {
+  // ฟังก์ชันยกเลิกออเดอร์
+  const handleCancelOrder = async (id) => {
+    if (window.confirm(`คุณต้องการยกเลิกออเดอร์ ID: ${id} ใช่หรือไม่?`)) {
       try {
-        await deleteOrder(id)
-        
+        await cancelOrder(id);
         await refetch();
-        toast.success(`ลบออเดอร์ #${id} สำเร็จ`);
+        toast.success(`ยกเลิกออเดอร์ #${id} เรียบร้อยแล้ว`);
       } catch (err) {
         console.error(err);
-        toast.error("ไม่สามารถลบออเดอร์ได้");
+        toast.error("ไม่สามารถยกเลิกออเดอร์ได้");
       }
     }
   };
 
   const handleDeleteOrderItem = async (itemId) => {
-
-    if(!itemId) {return}
+    if(!itemId) { return; }
 
     if(window.confirm(`คุณต้องการลบรายการสินค้า ID: ${itemId} ใช่หรือไม่?`)) {
-       try{
-
-        await deleteOrderItem(itemId)
+       try {
+        await deleteOrderItem(itemId);
         await refetch();
         toast.success(`ลบรายการสินค้า #${itemId} สำเร็จ`);
-       }catch(err){
+       } catch(err) {
         console.error(err);
         toast.error("ไม่สามารถลบรายการสินค้าได้");
        }
     }
-  }
-
+  };
 
   return (
     <div className="max-w-7xl max-h-screen min-h-screen p-6 mx-auto space-y-6 bg-gray-50/30 text-gray-800 overflow-hidden">
       <Toaster position="top-center" reverseOrder={false} />
+      
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -156,7 +148,6 @@ const handleSaveOrder = async (payload) => {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* ช่องที่ 1: ออเดอร์ทั้งหมด */}
         <div className="bg-white p-4 rounded-lg border border-neutral-200 shadow-sm flex items-center gap-4">
           <div className="p-3 bg-neutral-100 rounded-lg text-[#1A1A1A]">
             <ShoppingCart className="w-6 h-6" />
@@ -170,7 +161,6 @@ const handleSaveOrder = async (payload) => {
           </div>
         </div>
 
-        {/* ช่องที่ 2: ยอดขายรวม */}
         <div className="bg-white p-4 rounded-lg border border-neutral-200 shadow-sm flex items-center gap-4">
           <div className="p-3 bg-emerald-50 rounded-lg text-emerald-600">
             <DollarSign className="w-6 h-6" />
@@ -184,7 +174,6 @@ const handleSaveOrder = async (payload) => {
           </div>
         </div>
 
-        {/* ช่องที่ 3: จำนวนสินค้าที่ขายได้ */}
         <div className="bg-white p-4 rounded-lg border border-neutral-200 shadow-sm flex items-center gap-4">
           <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
             <PackageCheck className="w-6 h-6" />
@@ -201,8 +190,6 @@ const handleSaveOrder = async (payload) => {
 
       {/* Table Section */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        
-        {/* Search Bar & Counter */}
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <div className="relative w-full sm:w-80">
@@ -222,7 +209,6 @@ const handleSaveOrder = async (payload) => {
           </div>
         </div>
 
-        {/* Content Table / States */}
         {loading ? (
           <div className="p-12 text-center text-gray-400 text-sm flex items-center justify-center gap-2">
             <Loader2 className="w-5 h-5 animate-spin" /> กำลังโหลดข้อมูลคำสั่งซื้อ...
@@ -251,6 +237,7 @@ const handleSaveOrder = async (payload) => {
               <tbody className="divide-y divide-gray-50 text-sm">
                 {filteredOrders.map((order, index) => {
                   const itemsCount = (order.items || []).length;
+                  const isCancelled = order.delivery_status === 'cancelled';
 
                   return (
                     <tr key={`${order.order_id}-${index}`} className="hover:bg-slate-50/50 transition-colors">
@@ -302,13 +289,16 @@ const handleSaveOrder = async (payload) => {
                             <Pencil className="w-4 h-4" />
                           </button>
 
-                          <button
-                            onClick={() => handleDeleteOrder(order.order_id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="ลบออเดอร์"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {/* แสดงปุ่มยกเลิก (XCircle) เฉพาะเมื่อสถานะยังไม่เป็น cancelled */}
+                          {!isCancelled && (
+                            <button
+                              onClick={() => handleCancelOrder(order.order_id)}
+                              className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                              title="ยกเลิกออเดอร์"
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -328,7 +318,6 @@ const handleSaveOrder = async (payload) => {
         onSave={handleSaveOrder}
         onDelete={handleDeleteOrderItem}
       />
-
     </div>
   );
 }

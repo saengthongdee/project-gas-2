@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { X, Loader2, Truck } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useVehicles } from "../vehicle/hook/useVehicle";
 import { useVehicleBrands } from "../vehiclebrand/hook/useVehicleBrand";
+import EmployeeFormFields from "./components/EmployeeFormFields";
+import DriverVehicleSelect from "./components/DriverVehicleSelect";
 
 const ROLE_MAP = {
   "ผู้จัดการร้าน": "1",
@@ -21,33 +23,19 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
     email: "",
     role_id: "1",
     vehicle_id: "",
-    status: "active", // 💡 เพิ่มค่าเริ่มต้น status เป็น active
+    status: "active",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const isDriver = String(formData.role_id) === "3";
 
-  const getBrandName = (brandId) => {
-    if (!Array.isArray(brands)) return "";
-    const brand = brands.find((b) => b.brand_id === brandId);
-    return brand ? brand.brand_type : "";
-  };
-
   const getRoleId = (data) => {
     if (!data) return "1";
-
     const rawVal = typeof data === "object" ? (data.role_id || data.id || data.name) : data;
     const strVal = String(rawVal).trim();
-
-    if (["1", "2", "3"].includes(strVal)) {
-      return strVal;
-    }
-
-    if (ROLE_MAP[strVal]) {
-      return ROLE_MAP[strVal];
-    }
-
+    if (["1", "2", "3"].includes(strVal)) return strVal;
+    if (ROLE_MAP[strVal]) return ROLE_MAP[strVal];
     return "1";
   };
 
@@ -72,7 +60,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
         email: initialData.email || "",
         role_id: getRoleId(rawRole),
         vehicle_id: matchedVehicleId,
-        status: initialData.status || "active", // 💡 โหลดค่า status เดิมมาแสดง (ถ้ามี)
+        status: initialData.status || "active",
       });
     } else {
       setFormData({
@@ -81,7 +69,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
         email: "",
         role_id: "1",
         vehicle_id: "",
-        status: "active", // 💡 ค่าเริ่มต้นสำหรับเพิ่มใหม่
+        status: "active",
       });
     }
     setError(null);
@@ -89,14 +77,11 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
-
       if (name === "role_id" && value !== "3") {
         updated.vehicle_id = "";
       }
-
       return updated;
     });
   };
@@ -112,7 +97,7 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
       email: formData.email,
       role_id: Number(formData.role_id),
       vehicle_id: isDriver && formData.vehicle_id ? Number(formData.vehicle_id) : null,
-      status: formData.status, // 💡 แนบค่า status ส่งไปใน Payload ด้วย
+      status: formData.status,
     };
 
     try {
@@ -161,125 +146,18 @@ export default function EmployeeSlideOver({ isOpen, onClose, onSave, initialData
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
-                ชื่อ-นามสกุล <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                required
-                placeholder="เช่น นายสมชาย สายซิ่ง"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
-              />
-            </div>
+            {/* ฟิลด์ข้อมูลหลัก */}
+            <EmployeeFormFields formData={formData} handleChange={handleChange} />
 
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
-                เบอร์โทรศัพท์ <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="phone"
-                required
-                placeholder="เช่น 086-222-3333"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
-                อีเมล <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="เช่น somchai@gas.com"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
-                ตำแหน่ง / บทบาท <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="role_id"
-                value={formData.role_id}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
-              >
-                <option value="1">ผู้จัดการร้าน</option>
-                <option value="2">แอดมินรับโทรศัพท์</option>
-                <option value="3">คนขับรถส่งแก๊ส</option>
-              </select>
-            </div>
-
-            {/* 💡 เพิ่ม Dropdown สำหรับจัดการ Status */}
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
-                สถานะการใช้งาน <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
-              >
-                <option value="active">Active (ใช้งานปกติ)</option>
-                <option value="inactive">Inactive (ระงับการใช้งาน)</option>
-              </select>
-            </div>
-
+            {/* ส่วนเลือกยานพาหนะเฉพาะคนขับรถ */}
             {isDriver && (
-              <div className="pt-3 border-t border-neutral-200">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Truck className="w-4 h-4 text-neutral-600" />
-                  <label className="block text-sm font-medium text-[#1A1A1A]">
-                    เลือกยานพาหนะประจำตัว
-                  </label>
-                </div>
-
-                <select
-                  name="vehicle_id"
-                  value={formData.vehicle_id}
-                  onChange={handleChange}
-                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] bg-white"
-                >
-                  <option value="">-- ไม่ระบุ / เลือกยานพาหนะ --</option>
-                  {Array.isArray(vehicles) &&
-                    vehicles.map((v) => {
-                      const brandName = getBrandName(v.brand_id);
-                      const isCurrentVehicle = String(v.vehicle_id) === String(formData.vehicle_id);
-                      const isAvailable = Array.isArray(vehicleIsNull) && vehicleIsNull.some(
-                        (nullVehicle) => String(nullVehicle.vehicle_id) === String(v.vehicle_id)
-                      );
-                      const isBusy = !isAvailable && !isCurrentVehicle;
-
-                      return (
-                        <option
-                          key={v.vehicle_id}
-                          value={v.vehicle_id}
-                          disabled={isBusy}
-                          className={isBusy ? "text-neutral-400 bg-neutral-100" : ""}
-                        >
-                          {v.license_plate} {brandName ? `(${brandName})` : ""}{" "}
-                          {isBusy ? "(รถไม่ว่าง)" : isCurrentVehicle ? "(รถปัจจุบัน)" : ""}
-                        </option>
-                      );
-                    })}
-                </select>
-                <p className="text-xs text-neutral-400 mt-1.5">
-                  * รายการที่แสดง (รถไม่ว่าง) คือรถที่มีพนักงานคนอื่นประจำการอยู่แล้ว
-                </p>
-              </div>
+              <DriverVehicleSelect
+                formData={formData}
+                handleChange={handleChange}
+                vehicles={vehicles}
+                vehicleIsNull={vehicleIsNull}
+                brands={brands}
+              />
             )}
           </div>
 

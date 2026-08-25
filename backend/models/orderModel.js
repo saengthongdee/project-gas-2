@@ -103,6 +103,15 @@ const uploadImage = (order_id , imagePath , callback) => {
     db.query(sql , [imagePath , order_id]  , callback)
 }
 
+const cancelOrder = (order_id , callback) => {
+
+    const sql = 
+    `
+        update orders set delivery_status = 'cancelled' where order_id = ?;
+    `
+    db.query(sql ,order_id , callback)
+}
+
 module.exports={
     createOrder,
     updateOrder_Decrement,
@@ -116,5 +125,6 @@ module.exports={
     updateOrderStatus,
     findOrdertodayByVehicle,
     findOneOrder,
-    uploadImage
+    uploadImage,
+    cancelOrder
 }

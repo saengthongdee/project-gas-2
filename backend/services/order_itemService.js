@@ -221,7 +221,6 @@ const delete_itemsOrder = async (item_id) => {
                 })
             })
         })
-
     })
 }
 

@@ -41,7 +41,13 @@ const findEmployeeStatus = (employee_id , callback) => {
     const sql = "select status from employees where employee_id = ?"
 
     db.query(sql , employee_id , callback)
-} 
+}
+const findOneEmployee_name = (vehicle_id , callback) => {
+
+    const sql = `select name from employees where vehicle_id = ?`
+
+    db.query(sql , vehicle_id , callback)
+}
 
 module.exports={
     findAllEmployee,
@@ -49,5 +55,6 @@ module.exports={
     updateEmployee,
     deleteEmployee,
     ChangPassword,
-    findEmployeeStatus
+    findEmployeeStatus,
+    findOneEmployee_name
 }

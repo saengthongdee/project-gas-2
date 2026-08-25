@@ -4,6 +4,12 @@ const findAllProduct = async (callback) => {
     const sql = "SELECT * FROM products"
     db.query(sql, callback);
 }
+const findProductById = (product_id, callback) => {
+
+    const sql = 'select product_name , cost_price from products where product_id = ?'
+
+    db.query(sql ,product_id, callback)
+}
 
 const createProduct = async (productdata, callback) => {
     const sql = "INSERT INTO products set ?"
@@ -129,5 +135,6 @@ module.exports = {
     checkStock,
     updateStock,
     increaseStock,
-    decreaseStock
+    decreaseStock,
+    findProductById
 }

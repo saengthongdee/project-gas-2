@@ -2,10 +2,11 @@ const orderModel = require('../models/orderModel')
 const vihicleModel = require('../models/vehicleModel')
 const items_order = require('../models/order_itemModel')
 const productModel = require('../models/productModel')
-const cylinderDepositModel = require('../models/cylinderdepositModel')
+const historyModel = require('../models/historyOrder')
+const employeeModel = require('../models/employeeModel')
 
-const ApiError =require('../utils/ApiError')
-const authMiddleware =require('../middlewares/authMiddleware')
+const cylinderDepositModel = require('../models/cylinderdepositModel')
+const ApiError = require('../utils/ApiError')
 
 const createOrder = async (orderdata) => {
     return new Promise((success, fail) => {
@@ -15,6 +16,7 @@ const createOrder = async (orderdata) => {
             if (stockError) { return fail(stockError); }
 
             if (!stockCheck.sufficient) {
+
                 return success({
                     success: false,
                     message: "Insufficient stock for one or more items",
@@ -26,6 +28,7 @@ const createOrder = async (orderdata) => {
                 if (error) { return fail(error); }
 
                 const order_id = results.insertId || results.order_id;
+
                 if (!order_id) {
                     return fail(new Error("Cannot retrieved order_id, Insert might have failed."));
                 }
@@ -36,24 +39,63 @@ const createOrder = async (orderdata) => {
                     productModel.updateStock(items, (error) => {
                         if (error) { return fail(error); }
 
-                        // เตรียมข้อมูลสำหรับบันทึกถังฝาก (Cylinder Deposit)
                         const depositData = items.map((item) => [
                             mainOrderData.customer_id,
                             item.product_id,
                             order_id,
-                            item.quantity || item.qty_out || item.qty, // ปรับชื่อ property ของจำนวนสินค้าตามที่คุณส่งมาใน items
-                            0,          // qty_return เริ่มต้นเป็น 0
-                            new Date()  // deposit_date วันที่ปัจจุบัน
+                            item.quantity || item.qty_out || item.qty, 
+                            0,   
+                            new Date()  
                         ]);
 
-                        // เรียกใช้ฟังก์ชัน bulkCreateDeposite ที่คุณเขียนไว้ใน Model
-                        cylinderDepositModel.bulkCreateDeposite(depositData, (depositError) => {
+                        cylinderDepositModel.bulkCreateDeposite(depositData, async (depositError) => {
                             if (depositError) { return fail(depositError); }
 
-                            success({
-                                success: true,
-                                message: "create successfully, stock updated and cylinder deposit recorded"
-                            });
+                            try {
+
+                                const itemsWithNames = await Promise.all(
+                                    items.map((item) => {
+                                        return new Promise((resolve) => {
+
+                                            productModel.findProductById(item.product_id, (err, prodResult) => {
+
+                                                if(err) {return fail(err)}
+
+                                                const productName = prodResult?.[0]?.product_name;
+                                                const costPrice = prodResult?.[0]?.cost_price || 0;
+                                                const qty = item.quantity || item.qty_out || item.qty;
+
+                                                resolve({
+                                                    product_name: productName,
+                                                    quantity: qty,
+                                                    unit_price: item.unit_price,
+                                                    cost_price: costPrice
+                                                });
+                                            });
+                                        });
+                                    })
+                                );
+
+                                const fulfillmentLogData = {
+                                    order_id: order_id,
+                                    customer_id: mainOrderData.customer_id,
+                                    employee_name: null, 
+                                    items_snapshot: JSON.stringify(itemsWithNames), // แปลงเป็น JSON เก็บลง DB
+                                    delivery_date: new Date()
+                                };
+
+                                historyModel.createFulfillmentLog(fulfillmentLogData, (logError) => {
+                                    if (logError) { return fail(logError); }
+
+                                    success({
+                                        success: true,
+                                        message: "create successfully, stock updated, cylinder deposit recorded, and fulfillment log saved"
+                                    });
+
+                                });
+                            } catch (asyncErr) {
+                                fail(asyncErr);
+                            }
                         });
                     });
                 });
@@ -139,37 +181,49 @@ const findOrderbyStatus = async()=>{
     })
 }
 
-const updateOrderVehicle = async(order_id,vehicle_id) => {
+const updateOrderVehicle = async (order_id, vehicle_id) => {
+    return new Promise((success, fail) => {
+        
+        employeeModel.findOneEmployee_name(vehicle_id, (err, results) => {
+            if (err) { return fail(err); }
 
-    return new Promise((success , fail ) => {
+            const employee_name = results?.[0]?.name;
+            
+            if (!employee_name) {
+                return fail(new ApiError(400, "รถคันนี้ยังไม่ได้เชื่อมโยงกับพนักงาน กรุณากำหนดพนักงานก่อนจัดคิว"));
+            }
 
-        orderModel.updateOrderVehicle(order_id , vehicle_id , (err , results) => {
+            // 2. ถ้ามีพนักงานแล้ว ค่อยเริ่มทำการอัปเดตข้อมูลทั้งหมดตามลำดับ
+            orderModel.updateOrderVehicle(order_id, vehicle_id, (err, results) => {
+                if (err) { return fail(err); }
 
-            if(err) {return fail(err)}
+                orderModel.updateOrderStatus(order_id, 'delivering', (err, results) => {
+                    if (err) { return fail(err); }
 
-            orderModel.updateOrderStatus(order_id, 'delivering', (err, results) => {
+                    vihicleModel.updateVehicleStatus(vehicle_id, 'in_use', (err, results) => {
+                        if (err) { return fail(err); }
 
-                if(err) {return fail(err)}
+                        historyModel.updatVehiclenameByName(order_id, employee_name, (err, result) => {
+                            if (err) { return fail(err); }
 
-                vihicleModel.updateVehicleStatus(vehicle_id, 'in_use', (err, results) => {
-
-                    if(err) {return fail(err)}
-
-                    success({
-                        success:true,
-                        message:"Update order vehicle successfully"
-                    })
-                })
-            })
-        })
-    })
-}
+                            success({
+                                success: true,
+                                message: "Update order vehicle successfully"
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
 
 const findOrdertodayByVehicle = async(vehicle_id) => {
 
     return new Promise((success , fiil) => {
 
         orderModel.findOrdertodayByVehicle(vehicle_id , (err , results) => {
+            
             if(err) { return fail(err)}
             
             success({
@@ -226,6 +280,22 @@ const uploadImage = async(order_id , imagePath) => {
     })
 }
 
+const cancelOrder = async(order_id) => {
+
+    return new Promise((success , fail) => {
+
+        orderModel.cancelOrder(order_id , (err , results) =>{
+
+            if(err) {return fail(err)}
+
+            success({
+                success:true,
+                message: "cancel order successfully"
+            })
+        })
+    })
+}
+
 module.exports={
     createOrder,
     getAllOrder,
@@ -234,5 +304,6 @@ module.exports={
     updateOrderVehicle,
     findOrdertodayByVehicle,
     findOneOrder,
-    uploadImage
+    uploadImage,
+    cancelOrder
 }

@@ -1,0 +1,41 @@
+{
+  "data": {
+    "today_summary": {
+      "date": "2026-08-23",
+      "total_revenue": 12500.50,
+      "total_orders": 24,
+      "order_status": {
+        "pending": 3,
+        "delivering": 5,
+        "delivered": 16
+      }
+    },
+    "yearly_revenue_chart": [
+      { "month": "2026-01", "revenue": 120000, "profit": 35000 },
+      { "month": "2026-02", "revenue": 135000, "profit": 42000 },
+      { "month": "2026-03", "revenue": 142000, "profit": 46000 },
+      { "month": "2026-04", "revenue": 160000, "profit": 55000 },
+      { "month": "2026-05", "revenue": 155000, "profit": 50000 },
+      { "month": "2026-06", "revenue": 150000, "profit": 45000 },
+      { "month": "2026-07", "revenue": 145000, "profit": 40000 },
+      { "month": "2026-08", "revenue": 185000, "profit": 60000 }
+    ],
+    "low_stock_items": {
+      "total_count": 2,
+      "items": [
+        {
+          "item_id": "G001",
+          "name": "ถังแก๊ส ปตท. 15 กก.",
+          "quantity": 2,
+          "unit": "ถัง"
+        },
+        {
+          "item_id": "G002",
+          "name": "ถังแก๊ส เวิลด์แก๊ส 4 กก.",
+          "quantity": 4,
+          "unit": "ถัง"
+        }
+      ]
+    }
+  }
+}
