@@ -97,9 +97,7 @@ export default function FillingOrderSlideOver({
           {/* Header */}
           <div className="px-6 py-5 border-b border-neutral-200 bg-neutral-50 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#3a66cc]/10 flex items-center justify-center text-[#3a66cc]">
                 <Plus className="w-5 h-5" />
-              </div>
               <div>
                 <h2 className="text-base font-bold text-[#1A1A1A]">
                   เพิ่มบิลเติมแก๊ส
@@ -149,7 +147,7 @@ export default function FillingOrderSlideOver({
                   value={orderDate}
                   onChange={(e) => setOrderDate(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3a66cc] text-sm"
+                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#3a66cc] text-sm"
                 />
               </div>
 
@@ -208,7 +206,7 @@ export default function FillingOrderSlideOver({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-1/2 flex justify-center items-center gap-2 py-2.5 text-sm font-medium text-white bg-[#3a66cc] hover:bg-[#2d52a8] rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
+                className="w-1/2 flex justify-center items-center gap-2 py-2.5 text-sm font-medium btn-primary rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>บันทึกข้อมูล</span>

@@ -149,7 +149,7 @@ export default function MaintenanceSlideOver({
                   value={receivedDate}
                   onChange={(e) => setReceivedDate(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3a66cc] text-sm"
+                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#3a66cc] text-sm"
                 />
               </div>
 
@@ -208,7 +208,7 @@ export default function MaintenanceSlideOver({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-1/2 flex justify-center items-center gap-2 py-2.5 text-sm font-medium text-white bg-[#3a66cc] hover:bg-[#2d52a8] rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
+                className="w-1/2 flex justify-center items-center gap-2 py-2.5 text-sm font-medium btn-primary rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>บันทึกข้อมูล</span>
