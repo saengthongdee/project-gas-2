@@ -25,7 +25,7 @@ const formatThaiDate = (isoDateStr) => {
 
 export default function TopSummaryCards({
   selectedMonth,
-  monthly_revenue_chart,
+  monthly_revenue_chart = [],
   onMonthChange,
   revenue,
   profit,
@@ -98,21 +98,29 @@ export default function TopSummaryCards({
         </div>
       </div>
 
-      {/* การ์ดยอดขายวันนี้ พร้อมปรับดีไซน์สถานะออเดอร์ใหม่ */}
+      {/* การ์ดยอดขายวันนี้ พร้อมเพิ่มแสดงกำไรวันนี้ */}
       <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs flex flex-col justify-between">
          <div>
-           <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">อัปเดตวันนี้</span>
-              <span className="text-[11px] font-medium text-slate-500 tabular-nums">{formatThaiDate(today_summary?.date)}</span>
-           </div>
-           <div className="tabular-nums text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-              {formatCurrency(today_summary?.total_revenue, 2)}
-           </div>
-           <p className="text-xs text-slate-500 mt-0.5">{today_summary?.total_orders || 0} รายการออเดอร์ในวันนี้</p>
+            <div className="flex items-center justify-between mb-1">
+               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">อัปเดตวันนี้</span>
+               <span className="text-[11px] font-medium text-slate-500 tabular-nums">{formatThaiDate(today_summary?.date)}</span>
+            </div>
+            
+            {/* แสดงยอดขายและกำไรวันนี้ในบรรทัดเดียวกัน */}
+            <div className="flex items-baseline justify-between mt-1">
+               <div className="tabular-nums text-2xl sm:text-3xl font-bold text-slate-900">
+                  {formatCurrency(today_summary?.total_revenue, 2)}
+               </div>
+               <span className="text-xs font-bold text-emerald-600  py-1 rounded-lg">
+                  กำไร {formatCurrency(today_summary?.total_profit, 2)}
+               </span>
+            </div>
+
+            <p className="text-xs text-slate-500 mt-0.5">{today_summary?.total_orders || 0} รายการออเดอร์ในวันนี้</p>
          </div>
 
-         {/* ดีไซน์ใหม่: แถบสถานะแบบ Clean & Minimal (ไร้กรอบกล่องทึบ แยกด้วยเส้นแบ่งเบาๆ) */}
-         <div className="grid grid-cols-3 gap-3  mt-5 pt-4 border-t-2 border-neutral-200 ">
+         {/* แถบสถานะแบบ Clean & Minimal */}
+         <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t-2 border-neutral-200">
             <div className="flex flex-col">
                <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>

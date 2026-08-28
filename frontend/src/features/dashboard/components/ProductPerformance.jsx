@@ -30,16 +30,16 @@ export default function ProductPerformance({ bestSellers = [], worstSellers = []
                     {index + 1}
                   </span>
                   <div>
-                    <span className="text-xs font-bold text-slate-900 block">
+                    <span className="text-sm font-semibold text-slate-700 block">
                       {item?.name || 'สินค้า'}
                     </span>
-                    <span className="text-[11px] text-slate-500 tabular-nums">
+                    <span className="text-[12px] text-slate-500 tabular-nums">
                       ขายแล้ว {soldCount} หน่วย
                     </span>
                   </div>
                 </div>
 
-                <span className="text-xs font-bold text-slate-900 tabular-nums">
+                <span className="text-sm font-semibold text-slate-700 tabular-nums">
                   {formatCurrency(item?.revenue)}
                 </span>
               </div>
@@ -68,16 +68,16 @@ export default function ProductPerformance({ bestSellers = [], worstSellers = []
                     {index + 1}
                   </span>
                   <div>
-                    <span className="text-xs font-bold text-slate-900 block">
+                    <span className="text-sm font-semibold text-slate-700 block">
                       {item?.name || 'สินค้า'}
                     </span>
-                    <span className="text-[11px] text-slate-500 tabular-nums">
+                    <span className="text-[12px] text-slate-500 tabular-nums">
                       ขายได้ {soldCount} หน่วย
                     </span>
                   </div>
                 </div>
 
-                <span className="text-xs font-bold text-slate-600 tabular-nums">
+                <span className="text-sm font-semibold text-slate-700 tabular-nums">
                   {formatCurrency(item?.revenue)}
                 </span>
               </div>

@@ -6,21 +6,27 @@ const findTotal_revenue = (callback) => {
 
     const sql = 
     `
-        SELECT SUM(item.quantity * item.unit_price) AS today_total_amount
+        SELECT 
+            SUM(item.quantity * item.unit_price) AS today_total_amount,
+            SUM(item.quantity * (item.unit_price - item.cost_price)) AS today_total_profit
         FROM order_fulfillment_log f
         JOIN orders o ON f.order_id = o.order_id
         CROSS JOIN JSON_TABLE(
             f.items_snapshot,
             '$[*]' COLUMNS (
                 quantity INT PATH '$.quantity',
-                unit_price DECIMAL(10,2) PATH '$.unit_price'
+                unit_price DECIMAL(10,2) PATH '$.unit_price',
+                cost_price DECIMAL(10,2) PATH '$.cost_price'
             )
         ) AS item
-        WHERE f.delivery_date >= CURDATE()
+        WHERE f.delivery_date >= CURDATE() 
+        AND f.delivery_date < CURDATE() + INTERVAL 1 DAY
         AND o.delivery_status = 'delivered';
     `
     db.query(sql , callback)
 }
+
+
 
 const findTotal_orders = (callback) => {
 

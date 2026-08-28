@@ -67,11 +67,11 @@ export default function TransactionTable({ filteredTransactions = [], chartSelec
                 {/* เปลี่ยนจาก filteredTransactions.map เป็น currentItems.map */}
                 {currentItems.map((tx, idx) => (
                   <tr key={tx?.order_id || idx} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 text-xs font-bold text-slate-900">{tx?.order_id}</td>
-                    <td className="py-3.5 px-4 text-xs text-slate-600 tabular-nums">{formatThaiDate(tx?.delivered_at)}</td>
-                    <td className="py-3.5 px-4 text-xs font-medium text-slate-800">{tx?.customer_name}</td>
-                    <td className="py-3.5 px-4 text-xs text-slate-700 text-center tabular-nums">{tx?.items_count} รายการ</td>
-                    <td className="py-3.5 px-4 text-xs font-bold text-slate-900 tabular-nums text-right">
+                    <td className="py-3.5 px-4 text-sm font-semibold text-slate-700">{tx?.order_id}</td>
+                    <td className="py-3.5 px-4 text-sm text-slate-600 tabular-nums">{formatThaiDate(tx?.delivered_at)}</td>
+                    <td className="py-3.5 px-4 text-sm font-medium text-slate-800">{tx?.customer_name}</td>
+                    <td className="py-3.5 px-4 text-sm text-slate-700 text-center tabular-nums">{tx?.items_count} รายการ</td>
+                    <td className="py-3.5 px-4 text-sm font-semibold text-slate-700 tabular-nums text-right">
                       {formatCurrency(tx?.total_amount)}
                     </td>
                     <td className="py-3.5 px-4 text-center">

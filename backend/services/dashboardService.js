@@ -37,6 +37,10 @@ const findAlldashboard = async () => {
         const totalRevenue = revenueResult?.[0]?.today_total_amount 
             ? parseFloat(revenueResult[0].today_total_amount) 
             : 0;
+        
+        const totalProfit = revenueResult?.[0].today_total_profit
+            ? parseFloat(revenueResult[0].today_total_profit)
+            : 0;
 
         // 2. Extract total_orders
         const totalOrders = ordersResult?.[0]?.count_order 
@@ -78,6 +82,7 @@ const findAlldashboard = async () => {
                 today_summary: {
                     date: todayStr,
                     total_revenue: totalRevenue,
+                    total_profit: totalProfit,
                     total_orders: totalOrders,
                     order_status: {
                         pending: Number(orderStatus.pending || 0),

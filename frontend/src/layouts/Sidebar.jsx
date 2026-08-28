@@ -112,8 +112,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#F5F8FB] text-slate-200 h-screen p-2 flex flex-col justify-between shadow-lg shrink-0 overflow-hidden">
-      {/* Brand Header */}
+    <aside className="w-64 hidden md:flex  bg-[#F5F8FB] text-slate-200 h-screen p-2  flex-col justify-between shadow-lg shrink-0 overflow-hidden">
       <div className="text-xl font-bold p-3 mb-3 border-b border-neutral-700 text-[#1A1A1A] flex items-center gap-2 shrink-0">
         <span>ระบบจัดการร้านแก๊ส</span>
       </div>

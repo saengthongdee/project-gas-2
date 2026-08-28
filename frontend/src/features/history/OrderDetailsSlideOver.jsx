@@ -203,7 +203,7 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
                   <img
                     src={finalImageUrl}
                     alt="Delivery Proof"
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium gap-1.5">
                     <ExternalLink className="w-4 h-4" /> ดูรูปขนาดเต็ม
