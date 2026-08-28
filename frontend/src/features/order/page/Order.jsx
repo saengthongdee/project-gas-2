@@ -85,10 +85,13 @@ export default function Order() {
     });
   }, [orders, searchTerm]);
 
-  const stats = useMemo(() => {
-    const totalCount = orders.length;
-    const totalRevenue = orders.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0);
-    const totalItemsCount = orders.reduce((sum, order) => {
+const stats = useMemo(() => {
+
+    const activeOrders = orders.filter(order => order.delivery_status !== 'cancelled');
+
+    const totalCount = activeOrders.length;
+    const totalRevenue = activeOrders.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0);
+    const totalItemsCount = activeOrders.reduce((sum, order) => {
       const items = order.items || [];
       return sum + items.reduce((iSum, item) => iSum + (Number(item.quantity) || 0), 0);
     }, 0);

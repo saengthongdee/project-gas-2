@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useHistory } from "../hook/useHistory";
-import OrderDetailsSlideOver from "../OrderDetailsSlideOver"; // นำเข้า SlideOver ที่สร้างใหม่
+import OrderDetailsSlideOver from "../OrderDetailsSlideOver";
 import {
   Search,
   Loader2,
@@ -9,7 +9,9 @@ import {
   Truck,
   Calendar,
   X,
-  Package
+  Package,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 export default function History() {
@@ -21,12 +23,15 @@ export default function History() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 
+  // State สำหรับจัดการ Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const handleOpenDetails = (order) => {
     setSelectedOrder(order);
     setIsSlideOverOpen(true);
   };
 
-  // 💡 ฟังก์ชันแปลงสถานะเป็นภาษาไทยและกำหนดสีป้ายสถานะ
   const getDeliveryStatusConfig = (status) => {
     switch (status?.toLowerCase()) {
       case "delivered":
@@ -42,8 +47,15 @@ export default function History() {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedDate]);
+
   const filteredOrders = useMemo(() => {
-    return orders.filter((o) => {
+    // เรียงลำดับจาก order_id มากไปน้อย (ใหม่ไปเก่า) ก่อนนำไปกรอง
+    const sortedOrders = [...orders].sort((a, b) => Number(b.order_id) - Number(a.order_id));
+
+    return sortedOrders.filter((o) => {
       const term = searchTerm.toLowerCase();
       const matchesSearch =
         !searchTerm.trim() ||
@@ -62,6 +74,14 @@ export default function History() {
     });
   }, [orders, searchTerm, selectedDate]);
 
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentOrders = filteredOrders.slice(startIndex, endIndex);
+
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6 overflow-hidden max-h-screen">
       {/* Header Section */}
@@ -79,7 +99,6 @@ export default function History() {
         </div>
       </div>
 
-      {/* Error Alert */}
       {error && (
         <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           <AlertCircle className="w-5 h-5 shrink-0" />
@@ -87,16 +106,14 @@ export default function History() {
         </div>
       )}
 
-      {/* Table Section */}
-      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
-        {/* Toolbar: Search & Date Filter */}
-        <div className="p-4 border-b border-neutral-200 bg-neutral-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-[75vh]">
+        <div className="p-4 border-b border-neutral-200 bg-neutral-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <div className="relative w-full sm:w-72">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
               <input
                 type="text"
-                placeholder="ค้นหาเลขออเดอร์, ลูกค้า, คนขับ..."
+                placeholder="ค้นหาเลขออเดอร์, ลูกค้า..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-3 py-1.5 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#5b5b5b] text-[#1A1A1A]"
@@ -132,89 +149,146 @@ export default function History() {
         </div>
 
         {loading && orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-neutral-400 gap-2">
+          <div className="flex flex-col items-center justify-center flex-1 text-neutral-400 gap-2">
             <Loader2 className="w-8 h-8 animate-spin text-[#1A1A1A]" />
             <p className="text-sm">กำลังโหลดประวัติการสั่งซื้อ...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-16 text-neutral-400">
+          <div className="flex items-center justify-center flex-1 text-neutral-400">
             <p className="text-sm">
               {searchTerm || selectedDate ? "ไม่พบข้อมูลออเดอร์ที่ตรงกับการค้นหาหรือวันที่เลือก" : "ไม่พบประวัติการสั่งซื้อในระบบ"}
             </p>
           </div>
         ) : (
-          <div className="max-h-[60vh] overflow-y-scroll custom-scrollbar">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#F5F8FB] border-b border-neutral-200 text-xs font-semibold text-[#545454] uppercase tracking-wider">
-                  <th className="py-3.5 px-4">Order ID</th>
-                  <th className="py-3.5 px-4">วันที่สั่งซื้อ</th>
-                  <th className="py-3.5 px-4">ลูกค้า (ผู้รับ)</th>
-                  <th className="py-3.5 px-4">รายการสินค้า</th>
-                  <th className="py-3.5 px-4">ยอดรวม</th>
-                  <th className="py-3.5 px-4">พนักงานจัดส่ง</th>
-                  <th className="py-3.5 px-4">สถานะการส่ง</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-200 text-sm text-[#1A1A1A]">
-                {filteredOrders.map((order) => {
-                  const statusConfig = getDeliveryStatusConfig(order.delivery_status);
+          <>
+            <div className="overflow-y-auto custom-scrollbar flex-1">
+              <table className="w-full text-left border-collapse">
+                <thead className="sticky top-0 bg-[#F5F8FB] z-10 shadow-sm">
+                  <tr className="border-b border-neutral-200 text-xs font-semibold text-[#545454] uppercase tracking-wider">
+                    <th className="py-3.5 px-4">Order ID</th>
+                    <th className="py-3.5 px-4">วันที่สั่งซื้อ</th>
+                    <th className="py-3.5 px-4">ลูกค้า (ผู้รับ)</th>
+                    <th className="py-3.5 px-4">รายการสินค้า</th>
+                    <th className="py-3.5 px-4">ยอดรวม</th>
+                    <th className="py-3.5 px-4">พนักงานจัดส่ง</th>
+                    <th className="py-3.5 px-4">สถานะการส่ง</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-200 text-sm text-[#1A1A1A]">
+                  {currentOrders.map((order) => {
+                    const statusConfig = getDeliveryStatusConfig(order.delivery_status);
 
-                  return (
-                    <tr key={order.order_id} className="hover:bg-neutral-50/60 transition-colors">
-                      <td className="py-3.5 px-4 font-semibold text-[#1A1A1A]">
-                        #{order.order_id}
-                      </td>
-                      <td className="py-3.5 px-4 text-neutral-600">
-                      {order.order_date
+                    return (
+                      <tr key={order.order_id} className="hover:bg-neutral-50/60 transition-colors">
+                        <td className="py-3.5 px-4 font-semibold text-[#1A1A1A]">
+                          #{order.order_id}
+                        </td>
+                        <td className="py-3.5 px-4 text-neutral-600">
+                        {order.order_date
                             ? new Date(order.order_date).toLocaleDateString("th-TH", {
                                 day: "2-digit",
                                 month: "2-digit",
                                 year: "numeric",
                               })
                             : "-"}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="font-medium flex items-center gap-1.5">
-                          <User className="w-3.5 h-3.5 text-neutral-400" />
-                          {order.customer_name}
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="font-medium flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-neutral-400" />
+                            {order.customer_name}
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <button
+                            onClick={() => handleOpenDetails(order)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-md transition-colors border border-neutral-200"
+                          >
+                            <Package className="w-3.5 h-3.5 text-neutral-500" />
+                            <span>ดูรายการ ({order.items_snapshot?.length || 0})</span>
+                          </button>
+                        </td>
+                        <td className="py-3.5 px-4 font-semibold text-[#1A1A1A]">
+                          {Number(order.total_amount).toLocaleString("th-TH", { minimumFractionDigits: 2 })} ฿
+                        </td>
+                        <td className="py-3.5 px-4 text-neutral-600">
+                          <div className="flex items-center gap-1.5">
+                            <Truck className="w-3.5 h-3.5 text-neutral-400" />
+                            {order.employee_name || "-"}
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig.className}`}
+                          >
+                            {statusConfig.text}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 0 && (
+              <div className="p-4 border-t border-neutral-200 bg-white flex items-center justify-between shrink-0">
+                <span className="text-xs text-neutral-500">
+                  แสดงรายการที่ {startIndex + 1} ถึง {Math.min(endIndex, filteredOrders.length)} จากทั้งหมด {filteredOrders.length} รายการ
+                </span>
+                
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className="p-1.5 rounded-md border border-neutral-200 text-neutral-600 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  
+                  <div className="flex items-center gap-1 px-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      if (
+                        totalPages > 5 &&
+                        page !== 1 &&
+                        page !== totalPages &&
+                        Math.abs(currentPage - page) > 1
+                      ) {
+                        if (Math.abs(currentPage - page) === 2) {
+                          return <span key={page} className="text-neutral-400 text-xs px-1">...</span>;
+                        }
+                        return null;
+                      }
+
+                      return (
                         <button
-                          onClick={() => handleOpenDetails(order)}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-md transition-colors border border-neutral-200"
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-7 h-7 flex items-center justify-center text-xs font-medium rounded-md transition-colors ${
+                            currentPage === page
+                              ? 'bg-[#1A1A1A] text-white'
+                              : 'text-neutral-600 hover:bg-neutral-100'
+                          }`}
                         >
-                          <Package className="w-3.5 h-3.5 text-neutral-500" />
-                          <span>ดูรายการ ({order.items_snapshot?.length || 0})</span>
+                          {page}
                         </button>
-                      </td>
-                      <td className="py-3.5 px-4 font-semibold text-[#1A1A1A]">
-                        {Number(order.total_amount).toLocaleString("th-TH", { minimumFractionDigits: 2 })} ฿
-                      </td>
-                      <td className="py-3.5 px-4 text-neutral-600">
-                        <div className="flex items-center gap-1.5">
-                          <Truck className="w-3.5 h-3.5 text-neutral-400" />
-                          {order.employee_name || "-"}
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig.className}`}
-                        >
-                          {statusConfig.text}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-md border border-neutral-200 text-neutral-600 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* Render SlideOver */}
       <OrderDetailsSlideOver
         isOpen={isSlideOverOpen}
         onClose={() => setIsSlideOverOpen(false)}

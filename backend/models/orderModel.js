@@ -112,6 +112,17 @@ const cancelOrder = (order_id , callback) => {
     db.query(sql ,order_id , callback)
 }
 
+const findOrderCount = (vehicle_id, callback) => {
+    const sql = `
+        SELECT count(order_id) as order_delivering 
+        FROM orders 
+        WHERE vehicle_id = ? 
+        AND delivery_status = 'delivering'
+    `;
+    
+    db.query(sql, [vehicle_id], callback);
+}
+
 module.exports={
     createOrder,
     updateOrder_Decrement,
@@ -126,5 +137,6 @@ module.exports={
     findOrdertodayByVehicle,
     findOneOrder,
     uploadImage,
-    cancelOrder
+    cancelOrder,
+    findOrderCount
 }

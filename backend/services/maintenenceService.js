@@ -1,63 +1,57 @@
 const maintenenceModel = require('../models/maintenanceModel')
 const ApiError=require('../utils/ApiError')
 
-const findAllMaintenence =async()=>{
-    return new Promise((success,fail)=>{
-        maintenenceModel.findAllMaintenance((err,results)=>{
+const findAllMaintenance = () => {
+
+    return new Promise((success , fail) => {
+
+        maintenenceModel.findAllMaintenance((err , result) => {
+
+            if(err) {return fail(err)}
+
+            success({
+                success: true,
+                message: "fetching maintenance successfully",
+                data: result
+            })
+        })
+    })
+}
+
+const createMaintenance = (data) => {
+
+    return new Promise((success , fail) => {
+
+        maintenenceModel.createMaintenance(data , (err , result) => {
+
+            if(err) {return fail(err)}
+
+            success({
+                success: true,
+                message: "created maintenanace successfully"
+            })
+        })
+    })
+}
+
+const deleteMaintenance = (id) => {
+
+    return new Promise((success , fail) => {
+
+        maintenenceModel.deleteMaintenance(id , (err , result) => {
+
             if(err){return fail(err)}
 
             success({
-                success:true,
-                message:"Maintenence retrived Successfully",
-                data:results
+                success: true,
+                message: "delete maintenance successfully"
             })
         })
     })
 }
 
-const createMaintenence = async(maintenencedata)=>{
-    return new Promise((success,fail)=>{
-        maintenenceModel.createMaintenance(maintenencedata,(err,results)=>{
-            if(err){return fail(err)}
-            success({
-                success:true,
-                message:"Maintenence create Successfully",
-                data:results
-            })
-        })
-    })
-}
-
-const updateMaintenence = async(maintenencedata,maintenence_id)=>{
-    return new Promise((success,fail)=>{
-        maintenenceModel.updateMaintenance(maintenencedata,maintenence_id,(err,results)=>{
-            if(err){return fail(err)}
-            success({
-                success:true,
-                message:"Maintenence updated Successfully",
-                data:results
-            })
-        })
-    })
-    
-}
-
-const deleteMaintenence =async(maintenence_id)=>{
-    return new Promise((succes,fail)=>{
-        maintenenceModel.deleteMaintenance(maintenence_id,(err,results)=>{
-            if(err){return fail(err)}
-
-            succes({
-                succes:true,
-                message:"Maintenence deleted Successfully"
-            })
-        })
-    })
-}
-
-module.exports={
-    findAllMaintenence,
-    createMaintenence,
-    updateMaintenence,
-    deleteMaintenence
+module.exports ={
+    findAllMaintenance,
+    createMaintenance,
+    deleteMaintenance
 }

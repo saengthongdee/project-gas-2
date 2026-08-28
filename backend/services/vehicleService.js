@@ -72,6 +72,7 @@ const findVehicleISNull = async() => {
         })
     })
 }
+
 const updateVehicleStatus = (vehicle_id) => {
 
     return new Promise((success , fail) => {

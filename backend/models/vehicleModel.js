@@ -13,6 +13,16 @@ const createVehicle = async(vehicledata,callback)=>{
     const sql="INSERT INTO vehicles set ?"
     db.query(sql,vehicledata,callback);
 }
+
+const findVehicleID = (order_id,callback) => {
+
+    const sql = 
+    `
+        select vehicle_id from orders where order_id = ?;
+    `
+    db.query(sql , order_id , callback)
+}
+
 const updateVehicle =async(vehicledata,vehicle_id,callback)=>{
     const sql="UPDATE vehicles set ? where vehicle_id= ?"
     db.query(sql,[vehicledata,vehicle_id],callback);
@@ -45,6 +55,6 @@ module.exports={
     updateVehicle,
     deleteVehicle,
     updateVehicleStatus,
-    findVehicleISNull
-
+    findVehicleISNull,
+    findVehicleID
 }

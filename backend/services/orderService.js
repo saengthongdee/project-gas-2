@@ -5,6 +5,8 @@ const productModel = require('../models/productModel')
 const historyModel = require('../models/historyOrder')
 const employeeModel = require('../models/employeeModel')
 
+const vehicleService = require('../services/vehicleService')
+
 const cylinderDepositModel = require('../models/cylinderdepositModel')
 const ApiError = require('../utils/ApiError')
 
@@ -288,10 +290,41 @@ const cancelOrder = async(order_id) => {
 
             if(err) {return fail(err)}
 
-            success({
-                success:true,
-                message: "cancel order successfully"
-            })
+                cylinderDepositModel.deleteCylinderdeposit(order_id , (err , result) => {
+
+                    if(err){ return fail(err)}
+
+                    vihicleModel.findVehicleID(order_id ,(err , result) => {
+
+                        if(err) {return fail(err)}
+
+                        const vehicle_id = result[0].vehicle_id
+
+                        orderModel.findOrderCount(vehicle_id , (err , result) => {
+
+                            if(err){return fail(err)}
+
+                            const count = result[0].order_delivering
+
+                            console.log(count)
+
+                            if(count === 0) {
+                                vehicleService.updateVehicleStatus(vehicle_id)
+
+                                success({
+                                    success:true,
+                                    message: "cancel order and update vehicleStatus successfully"
+                                })
+
+                            }else {
+                                success({
+                                    success:true,
+                                    message: "cancel order successfully"
+                                })
+                            }
+                        })
+                    })
+                })
         })
     })
 }

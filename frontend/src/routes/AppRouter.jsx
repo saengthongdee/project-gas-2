@@ -13,6 +13,8 @@ import Order from '../features/order/page/Order'
 import Delivery from '../features/delivery/page/Delivery'
 import Cylinderdeposit from '../features/cylinderdeposit/page/Cylinderdeposit'
 import History from '../features/history/page/History'
+import FillingOrder from '../features/fillingOrder/page/fillingOrder'
+import Maintenance from '../features/maintenance/page/Maintenance'
 
 const ProtectedRoute = ({ children }) => {
 
@@ -75,6 +77,12 @@ const router = createBrowserRouter([
             },
             {
                 path: '/history' , element: <History/>
+            },
+            {
+                path: '/FillingOrder' , element: <FillingOrder/>
+            },
+            {
+                path: '/Maintenance' , element: <Maintenance/>
             }
         ]
     },

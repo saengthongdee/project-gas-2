@@ -25,9 +25,9 @@ const updateCylinderdeposit =async(deposit_id,qty_return,callback)=>{
     `
     db.query(sql,[qty_return,deposit_id],callback);
 }
-const deleteCylinderdeposit =async(deposit_id,callback)=>{
-    const sql="DELETE from cylinder_deposit where deposit_id= ?"
-    db.query(sql,[deposit_id],callback);
+const deleteCylinderdeposit =async(order_id,callback)=>{
+    const sql="DELETE from cylinder_deposit where order_id = ?"
+    db.query(sql,[order_id],callback);
 }
 
 module.exports={

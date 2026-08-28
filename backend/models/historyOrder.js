@@ -9,7 +9,8 @@ const historyOrder = (callback) => {
             join customers c
                 on o.customer_id  = c.customer_id
                     join order_fulfillment_log ofl
-                        on o.order_id = ofl.order_id;  
+                        on o.order_id = ofl.order_id
+                    order by o.order_id asc ;  
     `
 
     db.query(sql , callback)
@@ -25,11 +26,11 @@ const createFulfillmentLog = (fulfillmentLogData , callback) => {
     db.query(sql , fulfillmentLogData , callback)
 }
 
-const updatVehiclenameByName = (order_id ,employee_name, callback) => {
+const updatVehiclenameByName = (order_id, employee_name, callback) => {
+    // เปลี่ยนจาก = เป็น IN (?) เพื่อรองรับทั้งกรณีส่งค่าเดี่ยวและส่งมาเป็น Array หลาย ID
+    const sql = "update order_fulfillment_log set employee_name = ? where order_id IN (?)";
 
-    const sql = "update order_fulfillment_log set employee_name = ? where order_id = ?"
-
-    db.query(sql , [employee_name , order_id], callback)
+    db.query(sql, [employee_name, order_id], callback);
 }
 
 module.exports = {

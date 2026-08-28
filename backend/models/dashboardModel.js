@@ -7,15 +7,17 @@ const findTotal_revenue = (callback) => {
     const sql = 
     `
         SELECT SUM(item.quantity * item.unit_price) AS today_total_amount
-            FROM order_fulfillment_log f
-                CROSS JOIN JSON_TABLE(
-                    f.items_snapshot,
-                        '$[*]' COLUMNS (
-                        quantity INT PATH '$.quantity',
-                        unit_price DECIMAL(10,2) PATH '$.unit_price'
-                        )
-                    ) AS item
-            WHERE f.delivery_date >= CURDATE();
+        FROM order_fulfillment_log f
+        JOIN orders o ON f.order_id = o.order_id
+        CROSS JOIN JSON_TABLE(
+            f.items_snapshot,
+            '$[*]' COLUMNS (
+                quantity INT PATH '$.quantity',
+                unit_price DECIMAL(10,2) PATH '$.unit_price'
+            )
+        ) AS item
+        WHERE f.delivery_date >= CURDATE()
+        AND o.delivery_status = 'delivered';
     `
     db.query(sql , callback)
 }
@@ -48,26 +50,28 @@ const findOrder_status = (callback) => {
 
 const yearly_revenue_chart = (callback) => {
     const sql = `
-        SELECT
-            DATE_FORMAT(f.delivery_date, '%Y-%m') AS sale_month,
-            COALESCE(SUM(item.quantity * item.unit_price), 0) AS total_revenue,
-            COALESCE(SUM(item.quantity * p.cost_price), 0) AS total_cost,
-            COALESCE(SUM(item.quantity * (item.unit_price - p.cost_price)), 0) AS total_profit
-        FROM order_fulfillment_log f
-        CROSS JOIN JSON_TABLE(
-            f.items_snapshot,
-            '$[*]' COLUMNS (
-                product_name VARCHAR(255) PATH '$.product_name',
-                quantity INT PATH '$.quantity',
-                unit_price DECIMAL(10,2) PATH '$.unit_price'
-            )
-        ) AS item
-        LEFT JOIN products p 
-            ON item.product_name COLLATE utf8mb4_unicode_ci = p.product_name COLLATE utf8mb4_unicode_ci
-        GROUP BY DATE_FORMAT(f.delivery_date, '%Y-%m')
-        ORDER BY sale_month ASC;
+            SELECT
+                DATE_FORMAT(f.delivery_date, '%Y-%m') AS sale_month,
+                COALESCE(SUM(item.quantity * item.unit_price), 0) AS total_revenue,
+                COALESCE(SUM(item.quantity * p.cost_price), 0) AS total_cost,
+                COALESCE(SUM(item.quantity * (item.unit_price - p.cost_price)), 0) AS total_profit
+            FROM order_fulfillment_log f
+            JOIN orders o 
+                ON f.order_id = o.order_id 
+            CROSS JOIN JSON_TABLE(
+                f.items_snapshot,
+                '$[*]' COLUMNS (
+                    product_name VARCHAR(255) PATH '$.product_name',
+                    quantity INT PATH '$.quantity',
+                    unit_price DECIMAL(10,2) PATH '$.unit_price'
+                )
+            ) AS item
+            LEFT JOIN products p 
+                ON item.product_name COLLATE utf8mb4_unicode_ci = p.product_name COLLATE utf8mb4_unicode_ci
+            WHERE o.delivery_status != 'cancelled' and o.delivery_status != 'delivering'
+            GROUP BY DATE_FORMAT(f.delivery_date, '%Y-%m')
+            ORDER BY sale_month ASC;
     `;
-
     db.query(sql, callback);
 };
 

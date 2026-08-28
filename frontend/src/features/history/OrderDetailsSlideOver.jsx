@@ -12,6 +12,18 @@ import {
 export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
   const safeOrder = order || {};
 
+  // กำหนด URL ของ Backend
+  const BACKEND_URL = "http://localhost:5000";
+
+  // ฟังก์ชันแปลง Path ให้เป็น Full URL
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith("http")) return imagePath;
+    return `${BACKEND_URL}/${imagePath.replace(/^\//, "")}`;
+  };
+
+  const finalImageUrl = getFullImageUrl(safeOrder.imageUrl);
+
   // 💡 ฟังก์ชันแปลงสถานะเป็นภาษาไทยและกำหนดสีป้ายสถานะ
   const getDeliveryStatusConfig = (status) => {
     switch (status?.toLowerCase()) {
@@ -69,7 +81,7 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 custom-scrollbar overflow-y-auto p-6 space-y-6">
           {/* Status & Payment Info */}
           <div className="grid grid-cols-2 gap-4 p-4 bg-neutral-50 border border-neutral-200 rounded-xl items-center">
             <div className="border-r border-neutral-200 pr-4">
@@ -175,7 +187,7 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
           </div>
 
           {/* Proof Image */}
-          {safeOrder.imageUrl && (
+          {finalImageUrl && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-[#1A1A1A] flex items-center gap-1.5">
                 <ImageIcon className="w-4 h-4 text-neutral-500" />{" "}
@@ -183,13 +195,13 @@ export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
               </h3>
               <div className="border border-neutral-200 rounded-xl p-2 bg-neutral-50">
                 <a
-                  href={safeOrder.imageUrl}
+                  href={finalImageUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="block relative rounded-lg overflow-hidden group border border-neutral-200 bg-white"
                 >
                   <img
-                    src={safeOrder.imageUrl}
+                    src={finalImageUrl}
                     alt="Delivery Proof"
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />

@@ -68,7 +68,7 @@ export default function TopSummaryCards({
 
           <div className="flex-1 flex flex-col gap-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600">
+              <span className="text-[12.5px] font-bold uppercase tracking-wider text-sky-600">
                 ยอดขายเดือน {formatThaiMonth(selectedMonth)}
               </span>
               <select
@@ -90,7 +90,7 @@ export default function TopSummaryCards({
                   {momPercentage >= 0 ? '▲' : '▼'} {Math.abs(momPercentage).toFixed(1)}% จากเดือนก่อน
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
+              <span className="inline-flex items-center gap-1 text-[12.5px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
                 กำไรสุทธิ: {formatCurrency(profit)}
               </span>
             </div>

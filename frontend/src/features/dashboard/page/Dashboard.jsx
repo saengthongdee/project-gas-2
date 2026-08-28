@@ -8,6 +8,8 @@ import LowStockPanel from '../components/LowStockPanel';
 import ProductPerformance from '../components/ProductPerformance';
 import TransactionTable from '../components/TransactionTable';
 
+import { socket } from '../../../utils/socket';
+
 export default function DashboardPage() {
   const { dashboard1, dashboard2, loading, error, fetchDashboard1, fetchDashboard2 } = useDashboard();
   
@@ -36,6 +38,31 @@ export default function DashboardPage() {
     const timer = setTimeout(() => setIsLoaded(true), 50);
     return () => clearTimeout(timer);
   }, [fetchDashboard1, fetchDashboard2]);
+
+  useEffect(() => {
+    const handleOrderUpdate = (payload) => {
+      console.log("⚡ ได้รับสัญญาณอัปเดตจาก Socket:", payload);
+      
+      fetchDashboard1().then((resData) => {
+        const data = resData?.data || resData;
+        if (data) {
+          const monthlyArr = data.yearly_revenue_chart || [];
+          const targetMonth = selectedMonth || (monthlyArr.length > 0 ? monthlyArr[monthlyArr.length - 1].month : '2026-08');
+          const [year, month] = targetMonth.split('-');
+          
+          fetchDashboard2(year, month);
+        }
+      }).catch(err => {
+        console.error("Failed to refetch dashboard on socket event:", err);
+      });
+    };
+
+    socket.on("order_status_update", handleOrderUpdate);
+
+    return () => {
+      socket.off("order_status_update", handleOrderUpdate);
+    };
+  }, [fetchDashboard1, fetchDashboard2, selectedMonth]);
 
   const handleMonthChange = (newMonth) => {
     setSelectedMonth(newMonth);

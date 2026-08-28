@@ -1,26 +1,34 @@
-const db=require('../configs/db')
+const db = require('../configs/db')
 
-const findAllFillingorder = async(callback)=>{
-    const sql="SELECT * from filling_orders"
-    db.query(sql,callback);
-}
+const findALlFillingOrder = (callback) => {
 
-const createFillingorder = async(fillingdata ,callback)=>{
-    const sql="INSERT INTO filling_orders set ?"
-    db.query(sql,fillingdata,callback);
-}
-const updateFillingorder =async(fillingdata,filling_order_id,callback)=>{
-    const sql="UPDATE filling_orders set ? where filling_order_id= ? "
-    db.query(sql,[fillingdata,filling_order_id],callback);
-}
-const deleteFillingorder =async(filling_order_id,callback)=>{
-    const sql="DELETE FROM filling_orders where filling_order_id =?"
-    db.query(sql,[filling_order_id],callback);
+    const sql = 
+    `
+        select * from filling_orders
+    `
+    db.query(sql ,callback)
 }
 
-module.exports={
-    findAllFillingorder,
-    createFillingorder,
-    updateFillingorder,
-    deleteFillingorder
+const deletefillingOrder = (id , callback) => {
+
+    const sql = 
+    `
+        delete from filling_orders where filling_order_id = ?
+    `
+    db.query(sql , [id] , callback)
+}
+const createfillingOrder = (fillingData , callback) => {
+
+    const sql =    
+    `
+        insert into filling_orders set ?
+    `
+    db.query(sql , fillingData , callback)
+
+}
+
+module.exports = {
+    findALlFillingOrder,
+    deletefillingOrder,
+    createfillingOrder
 }

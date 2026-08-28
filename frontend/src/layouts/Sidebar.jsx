@@ -56,8 +56,8 @@ const menuSections = [
     category: "บิล / การค้างถัง",
     collapsible: true,
     items: [
-      { title: "บิลถังซ่อม", path: "/bills/maintenance", icon: Wrench, roles: [1] },
-      { title: "บิลถังบรรจุ", path: "/bills/filling", icon: Flame, roles: [1] },
+      { title: "บิลถังซ่อม", path: "/Maintenance", icon: Wrench, roles: [1] },
+      { title: "บิลถังบรรจุ", path: "/FillingOrder", icon: Flame, roles: [1] },
       { title: "รายการถังค้าง", path: "/cylinderdeposit", icon: ClipboardList, roles: [1] },
     ],
   },
