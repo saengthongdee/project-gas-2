@@ -1,7 +1,6 @@
 import { io } from "socket.io-client";
 
-// กำหนด URL ของ Backend
-const SOCKET_URL = "http://10.161.188.216:5000"; 
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "https://project-gas-2.onrender.com";
 
 export const socket = io(SOCKET_URL, {
     autoConnect: true,
