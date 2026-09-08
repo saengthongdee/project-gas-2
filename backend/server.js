@@ -52,6 +52,7 @@ app.use('/api/dashboard' , dashboardRouter)
 app.use(notfound)
 app.use(errorHandler)
 
+
 // 2. สร้าง HTTP Server ครอบ Express app และตั้งค่า Socket.io
 const server = http.createServer(app)
 const io = new Server(server, {
@@ -60,6 +61,10 @@ const io = new Server(server, {
         methods: ["GET", "POST"]
     }
 })
+
+app.get('/', (req, res) => {
+  res.status(200).send('Backend is running!');
+});
 
 // 3. ผูก io ไว้กับ app เพื่อให้ดึงไปใช้ใน Controller ได้ผ่าน req.app.get('io')
 app.set('io', io)
