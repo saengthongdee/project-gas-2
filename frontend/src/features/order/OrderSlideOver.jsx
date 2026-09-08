@@ -3,7 +3,7 @@ import { X, Loader2, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { useCustomer } from "../customers/hooks/useCustomer";
 import { useProduct } from "../product/hook/useProduct";
 
-export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , onDelete }) {
+export default function OrderSlideOver({ isOpen, onClose, onSave, initialData, onDelete }) {
   const { data: customers = [] } = useCustomer();
   const { data: products = [] } = useProduct();
 
@@ -24,12 +24,16 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
     if (!isOpen) return;
 
     if (initialData) {
-      const foundCustomerId =
-        initialData.customer_id ||
-        customers.find(
-          (c) => (c.name || c.customer_name) === initialData.customer_name
-        )?.customer_id ||
-        "";
+      // หาชื่อลูกค้าจาก initialData เพื่อนำมาแสดงผลในช่องกรอก
+      const matchedCustomer = customers.find(
+        (c) =>
+          Number(c.customer_id) === Number(initialData.customer_id) ||
+          (c.name || c.customer_name) === initialData.customer_name
+      );
+
+      const customerValue = matchedCustomer
+        ? (matchedCustomer.name || matchedCustomer.customer_name)
+        : (initialData.customer_name || initialData.customer_id || "");
 
       const mappedItems =
         initialData.items?.length > 0
@@ -37,7 +41,6 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
               let pId = i.product_id || "";
               let uPrice = Number(i.unit_price) || 0;
 
-              // ค้นหาสินค้าจาก ID หรือ Name ในลิสต์ products
               const matched = products.find((p) =>
                 pId
                   ? Number(p.product_id) === Number(pId)
@@ -60,7 +63,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
             })
           : [{ product_id: "", quantity: 1, unit_price: 0 }];
 
-      setFormData({ customer_id: foundCustomerId, items: mappedItems });
+      setFormData({ customer_id: customerValue, items: mappedItems });
     } else {
       setFormData({
         customer_id: "",
@@ -83,7 +86,6 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
     const newItems = [...formData.items];
     newItems[index][field] = value;
 
-    // ถ้าเปลี่ยนสินค้า ให้ดึงราคา unit_price ของสินค้านั้นมาใส่ทันที
     if (field === "product_id") {
       const selectedProduct = products.find(
         (p) => Number(p.product_id) === Number(value)
@@ -96,7 +98,6 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
     setFormData((prev) => ({ ...prev, items: newItems }));
   };
 
-  // เพิ่มรายการ order
   const addItemRow = () => {
     setFormData((prev) => ({
       ...prev,
@@ -104,10 +105,8 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
     }));
   };
 
-  // ลบรายการ order
   const removeItemRow = (index) => {
-
-    if(!index){ return}
+    if (!index) { return; }
 
     if (formData.items.length === 1) return;
     setFormData((prev) => ({
@@ -115,15 +114,25 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
       items: prev.items.filter((_, i) => i !== index),
     }));
 
-    onDelete(formData.items[index].item_id)
+    onDelete(formData.items[index].item_id);
   };
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
+    // ค้นหา customer_id จากชื่อที่ผู้ใช้พิมพ์เข้ามา หรือใช้ค่าเดิมหากเป็นตัวเลข
+    const matchedCustomer = customers.find(
+      (c) =>
+        String(c.customer_id) === String(formData.customer_id) ||
+        (c.name || c.customer_name)?.toLowerCase() === String(formData.customer_id).toLowerCase()
+    );
+
+    const customerIdFinal = matchedCustomer
+      ? Number(matchedCustomer.customer_id)
+      : (Number(formData.customer_id) || 0);
+
     const payload = {
-      customer_id: Number(formData.customer_id) || 0,
+      customer_id: customerIdFinal,
       total_amount: totalAmount,
       items: formData.items.map((i) => {
         const selectedProduct = products.find(
@@ -186,25 +195,28 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
               </div>
             )}
 
-            {/* เลือกลูกค้า */}
+            {/* ช่องกรอกข้อมูลลูกค้า (เปลี่ยนจาก select เป็น input + datalist) */}
             <div>
               <label className="block text-sm font-medium text-[#4b4a4a] mb-1">
                 ลูกค้า <span className="text-red-500">*</span>
               </label>
-              <select
+              <input
+                type="text"
                 name="customer_id"
                 required
                 value={formData.customer_id}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] cursor-pointer"
-              >
-                <option value="">-- เลือกลูกค้า --</option>
+                list="customer-options"
+                placeholder="พิมพ์ชื่อหรือเลือกลูกค้า..."
+                className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A]"
+              />
+              <datalist id="customer-options">
                 {customers.map((c) => (
-                  <option key={c.customer_id} value={c.customer_id}>
-                    {c.name || c.customer_name} {c.phone ? `(${c.phone})` : ""}
+                  <option key={c.customer_id} value={c.name || c.customer_name}>
+                    {c.phone ? `(${c.phone})` : ""}
                   </option>
                 ))}
-              </select>
+              </datalist>
             </div>
 
             {/* รายการสินค้า (Items Dynamic List) */}
@@ -312,7 +324,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData , 
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="w-1/2 px-4 py-3 text-sm font-medium text-neutral-700 bg-white hover:bg-gray-200 border border-neutral-300 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
+                className="w-1/2 px-4 py-3 text-sm font-medium text-neutral-700 bg-white hover:bg-gray-200 border border-neutral-300 rounded-lg transition-colors cursor-pointer"
               >
                 ยกเลิก
               </button>
