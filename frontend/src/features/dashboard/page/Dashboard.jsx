@@ -177,7 +177,7 @@ export default function DashboardPage() {
   const { today_summary, revenue, profit, momPercentage, maxMonthlyRev, maxWeeklyRev, sortedStockItems, pacingProgress, weekly_revenue_chart, monthly_revenue_chart, bestSellers, worstSellers } = analytics;
 
   return (
-    <div className="min-h-screen custom-scrollbar bg-[#f9f9f9] text-slate-900 pb-12 font-sans">
+    <div className="h-screen overflow-y-auto custom-scrollbar bg-[#f9f9f9] pb-12 font-sans">
       {/* Header */}
       <header className="bg-[#f9f9f9] border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
