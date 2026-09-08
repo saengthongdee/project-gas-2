@@ -19,6 +19,10 @@ const db = require('./configs/db')
 const notfound = require('./middlewares/notfound')
 const errorHandler = require('./middlewares/errorHandler')
 
+app.get('/', (req, res) => {
+  res.status(200).send('Backend is running!');
+});
+
 //routes 
 const authRouter =require('./routers/authRouter')
 const customerRouter =require('./routers/customerRouter')
@@ -49,6 +53,8 @@ app.use('/api/maintenence',maintenenceRouter)
 app.use('/api/historyOrder', historyOrderRouter)
 app.use('/api/dashboard' , dashboardRouter)
 
+
+
 app.use(notfound)
 app.use(errorHandler)
 
@@ -62,9 +68,7 @@ const io = new Server(server, {
     }
 })
 
-app.get('/', (req, res) => {
-  res.status(200).send('Backend is running!');
-});
+
 
 // 3. ผูก io ไว้กับ app เพื่อให้ดึงไปใช้ใน Controller ได้ผ่าน req.app.get('io')
 app.set('io', io)
