@@ -3,6 +3,9 @@ import { FolderOpen, Plus, Trash2, AlertCircle, Loader2, Calendar, X } from "luc
 import { useMaintenance } from "../hook/useMaintenance";
 import MaintenanceSlideOver from "../MaintenanceSlideOver";
 
+// กำหนด Base URL จาก Environment Variable
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export default function Maintenance() {
   const {
     data: maintenances,
@@ -155,13 +158,13 @@ export default function Maintenance() {
                   </button>
                 </div>
 
-                {/* ส่วนรูปภาพ: คลิกเพื่อเปิดรูปในแท็บใหม่ */}
+                {/* ส่วนรูปภาพ: ใช้ API_BASE_URL แทน localhost */}
                 <div
                   className={`p-4 flex-1 flex items-center justify-center bg-[#FAFAFA] min-h-[150px] sm:min-h-[180px] ${item.imageUrl ? "cursor-pointer group" : ""}`}
                   onClick={() =>
                     item.imageUrl &&
                     window.open(
-                      `http://localhost:5000/${item.imageUrl}`,
+                      `${API_BASE_URL}/${item.imageUrl}`,
                       "_blank",
                     )
                   }
@@ -169,7 +172,7 @@ export default function Maintenance() {
                 >
                   {item.imageUrl ? (
                     <img
-                      src={`http://localhost:5000/${item.imageUrl}`}
+                      src={`${API_BASE_URL}/${item.imageUrl}`}
                       alt="Maintenance"
                       className="max-h-44 object-contain rounded-lg transition-transform duration-200 group-hover:scale-105"
                     />

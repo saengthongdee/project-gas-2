@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../../api/axiosInstance";
 import { io } from "socket.io-client";
-
-const socket = io("http://localhost:5000");
+import { socket } from "../../../utils/socket";
 
 export const useOrder = () => {
   const [loading, setLoading] = useState(false);

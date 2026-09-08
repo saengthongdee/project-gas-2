@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../../api/axiosInstance";
 import { io } from "socket.io-client";
+import { socket } from "../../../utils/socket";
 
 // เชื่อมต่อ Socket ไปยัง Backend (ปรับ URL ตาม Port ของ Server จริง)
-const socket = io("http://localhost:5000");
+// const socket = io("http://localhost:5000");
 
 export const useDelivery = () => {
     const [loading, setLoading] = useState(false);

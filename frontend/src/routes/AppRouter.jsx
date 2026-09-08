@@ -16,10 +16,19 @@ import History from '../features/history/page/History'
 import FillingOrder from '../features/fillingOrder/page/fillingOrder'
 import Maintenance from '../features/maintenance/page/Maintenance'
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles, redirectTo = "/" }) => {
+    const { token, role } = useAuth()
+    const userRole = Number(role)
 
-    const { token } = useAuth()
-    return token ? children : <Navigate to="/login" replace />
+    if (!token) {
+        return <Navigate to="/login" replace />
+    }
+
+    if (allowedRoles && !allowedRoles.includes(userRole)) {
+        return <Navigate to={redirectTo} replace />
+    }
+
+    return children
 }
 
 const PublicRoute = ({ children }) => {
@@ -32,7 +41,7 @@ const router = createBrowserRouter([
         path: '/login',
         element: (
             <PublicRoute>
-                <Login/>
+                <Login />
             </PublicRoute>
         )
     },
@@ -45,49 +54,86 @@ const router = createBrowserRouter([
         ),
         children: [
             {
-                index: true, element: <Dashboard />
+                index: true, 
+                element: (
+                    <ProtectedRoute allowedRoles={[1]} redirectTo="/order">
+                        <Dashboard />
+                    </ProtectedRoute>
+                )
             },
             {
-                path: '/customer' , element: <Customer/>
+                path: '/customer', 
+                element: <Customer />
             },
             {
-                path: '/employee' , element: <Employees/>
+                path: '/employee', 
+                element: (
+                    <ProtectedRoute allowedRoles={[1]} redirectTo="/order">
+                        <Employees />
+                    </ProtectedRoute>
+                )
             },
             {
-                path: '/vehicles' , element: <Vehicles/>
+                path: '/vehicles', 
+                element: <Vehicles />
             },
             {
-                path: '/vehiclebrand' , element: <VehicleBrand/>
+                path: '/vehiclebrand', 
+                element: <VehicleBrand />
             },
             {
-                path: '/product' , element: <Product/>
+                path: '/product', 
+                element: <Product />
             },
             {
-                path: '/security' , element: <Security/>
+                path: '/security', 
+                element: (
+                    <ProtectedRoute allowedRoles={[1]} redirectTo="/order">
+                        <Security />
+                    </ProtectedRoute>
+                )
             },
             {
-                path: '/order' , element: <Order/>
-            }
-            ,
-            {
-                path: '/delivery' , element: <Delivery/>
+                path: '/order', 
+                element: <Order />
             },
             {
-                path: '/cylinderdeposit' , element: <Cylinderdeposit/>
+                path: '/delivery', 
+                element: <Delivery />
             },
             {
-                path: '/history' , element: <History/>
+                path: '/cylinderdeposit', 
+                element: (
+                    <ProtectedRoute allowedRoles={[1]} redirectTo="/order">
+                        <Cylinderdeposit />
+                    </ProtectedRoute>
+                )
             },
             {
-                path: '/FillingOrder' , element: <FillingOrder/>
+                path: '/history', 
+                element: <History />
             },
             {
-                path: '/Maintenance' , element: <Maintenance/>
+                path: '/FillingOrder', 
+                element: (
+                    <ProtectedRoute allowedRoles={[1]} redirectTo="/order">
+                        <FillingOrder />
+                    </ProtectedRoute>
+                )
+            },
+            {
+                path: '/Maintenance', 
+                element: (
+                    <ProtectedRoute allowedRoles={[1]} redirectTo="/order">
+                        <Maintenance />
+                    </ProtectedRoute>
+                )
             }
         ]
     },
     {
-        path: '*', element: <Navigate to="/" replace />
+        path: '*', 
+        element: <Navigate to="/" replace />
     }
 ])
 

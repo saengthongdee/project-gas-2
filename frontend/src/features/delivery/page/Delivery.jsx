@@ -78,6 +78,7 @@ export default function Delivery() {
   }, [selectableOrdersInFilter, selectedOrderIds]);
 
   const handleAssignQueue = async (payload) => {
+    
     try {
       const result = await assignVehicle(payload);
 

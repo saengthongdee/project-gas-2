@@ -12,8 +12,8 @@ import {
 export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
   const safeOrder = order || {};
 
-  // กำหนด URL ของ Backend
-  const BACKEND_URL = "http://localhost:5000";
+  // กำหนด URL ของ Backend จาก Environment Variable
+  const BACKEND_URL = import.meta.env.VITE_API_URL;
 
   // ฟังก์ชันแปลง Path ให้เป็น Full URL
   const getFullImageUrl = (imagePath) => {

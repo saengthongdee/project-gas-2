@@ -3,6 +3,8 @@ import { FolderOpen, Plus, Trash2, AlertCircle, Loader2, Calendar, X } from 'luc
 import { useFillingOrder } from '../hook/useFillingOrder'; 
 import FillingOrderSlideOver from '../FillingOrderSlideOver'; 
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export default function FillingOrder() {
   const { data: orders, loading, error, createFillingOrder, deleteFillingOrder, refetch } = useFillingOrder();
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
@@ -141,15 +143,15 @@ export default function FillingOrder() {
                   </button>
                 </div>
 
-                {/* ส่วนรูปภาพ: คลิกเพื่อเปิดรูปในแท็บใหม่ */}
+                {/* ส่วนรูปภาพ: ใช้ API_BASE_URL แทน localhost */}
                 <div 
                   className={`p-4 flex-1 flex items-center justify-center bg-[#FAFAFA] min-h-[150px] sm:min-h-[180px] ${order.imageUrl ? 'cursor-pointer group' : ''}`}
-                  onClick={() => order.imageUrl && window.open(`http://localhost:5000/${order.imageUrl}`, '_blank')}
+                  onClick={() => order.imageUrl && window.open(`${API_BASE_URL}/${order.imageUrl}`, '_blank')}
                   title={order.imageUrl ? "คลิกเพื่อเปิดรูปในแท็บใหม่" : ""}
                 >
                   {order.imageUrl ? (
                     <img 
-                      src={`http://localhost:5000/${order.imageUrl}`} 
+                      src={`${API_BASE_URL}/${order.imageUrl}`} 
                       alt="Bill" 
                       className="max-h-44 object-contain rounded-lg transition-transform duration-200 group-hover:scale-105"
                     />

@@ -14,6 +14,7 @@ exports.createOrders = asyncHandler(async(req,res,next)=>{
         }
     })
     const result =await orderService.createOrder(orderData)
+
     res.status(201).json(result)
 })
 exports.findAllOrders=asyncHandler(async(req,res,next)=>{
@@ -43,6 +44,20 @@ exports.updateOrderVehicle = asyncHandler(async (req, res, next) => {
   }
 
   const result = await orderService.updateOrderVehicle(order_ids, vehicle_id);
+
+
+//   socket ตอนแจ้งเตือนไปยังแอพ
+
+  const io = req.app.get('io');
+
+  if (io) {
+    io.emit('order_delivery', {
+      vehicle_id: Number(vehicle_id),
+      order_ids: order_ids,
+      status: 'delivering',
+    });
+  }
+
   res.status(200).json(result);
 });
 
