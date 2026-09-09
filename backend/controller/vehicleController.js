@@ -1,6 +1,7 @@
 const vehicleService = require('../services/vehicleService');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError =require('../utils/ApiError');
+const axios =require('axios')
 
 exports.findAllVehicle =asyncHandler(async(req,res,next)=>{
     const result=await vehicleService.findAllVehicle();

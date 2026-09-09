@@ -1,9 +1,10 @@
 const orderService =require('../services/orderService')
+const vehicleService = require('../services/vehicleService')
 const fs = require('fs');
 const path = require('path');
 const asyncHandler =require('../utils/asyncHandler')
 const ApiError = require('../utils/ApiError')
-
+const axios = require('axios');
 
 exports.createOrders = asyncHandler(async(req,res,next)=>{
     const orderData =req.body
@@ -56,6 +57,29 @@ exports.updateOrderVehicle = asyncHandler(async (req, res, next) => {
       order_ids: order_ids,
       status: 'delivering',
     });
+  }
+
+  try{
+
+    const tokenData = await vehicleService.findPushToken(vehicle_id)
+    const pushToken = tokenData?.push_token;
+
+    if (pushToken) {
+      await axios.post('https://exp.host/--/api/v2/push/send', {
+        to: pushToken,
+        sound: 'default',
+        title: 'มีงานจัดส่งแก๊สใหม่!',
+        body: `คุณได้รับออร์เดอร์ใหม่จำนวน ${order_ids.length} รายการ`,
+        data: {
+          type: 'order_delivery',
+          vehicle_id: Number(vehicle_id),
+          order_ids: order_ids,
+        },
+      });
+    } else {}
+    
+  }catch (pushError) {
+    console.error('ส่ง Push Notification ไม่สำเร็จ:', pushError?.response?.data || pushError.message);
   }
 
   res.status(200).json(result);

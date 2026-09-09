@@ -54,6 +54,13 @@ const updatePushToken = async (vehicle_id, push_token, callback) => {
     db.query(sql, [push_token, vehicle_id], callback);
 }
 
+const findPushToken = async (vehicle_id , callback) => {
+
+    const sql = "select  push_token from vehicles where vehicle_id = ?"
+
+    db.query(sql , [vehicle_id] , callback)
+}
+
 module.exports={
     findAllVehicle,
     createVehicle,
@@ -62,5 +69,6 @@ module.exports={
     updateVehicleStatus,
     findVehicleISNull,
     findVehicleID,
-    updatePushToken
+    updatePushToken,
+    findPushToken
 }
