@@ -64,6 +64,8 @@ exports.updateOrderVehicle = asyncHandler(async (req, res, next) => {
     const tokenData = await vehicleService.findPushToken(vehicle_id)
     const pushToken = tokenData?.push_token;
 
+    console.log("push token" , pushToken)
+
     if (pushToken) {
       await axios.post('https://exp.host/--/api/v2/push/send', {
         to: pushToken,
