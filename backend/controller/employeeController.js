@@ -14,6 +14,7 @@ exports.createEmployee = asyncHandler(async(req,res,next)=>{
 })
 
 exports.updateEmployee =asyncHandler(async(req,res,next)=>{
+
     const {id}=req.params
     const employeedata=req.body
 
@@ -26,6 +27,15 @@ exports.updateEmployee =asyncHandler(async(req,res,next)=>{
     })
 
     const result =await employeeService.updateEmployee(employeedata,id);
+
+    const io = req.app.get('io');
+    
+    if (io && (employeedata.status === 'inactive' || employeedata.is_active === 0 || employeedata.is_active === false)) {
+        io.emit('account_suspended', {
+        employee_id: Number(id),
+        message: 'บัญชีของคุณถูกระงับการใช้งาน',
+    });
+  }
     res.status(200).json(result);
 })
 exports.deleteEmployee = asyncHandler(async(req,res,next)=>{
