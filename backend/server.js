@@ -69,7 +69,6 @@ const io = new Server(server, {
 })
 
 
-
 // 3. ผูก io ไว้กับ app เพื่อให้ดึงไปใช้ใน Controller ได้ผ่าน req.app.get('io')
 app.set('io', io)
 

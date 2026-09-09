@@ -89,11 +89,27 @@ const updateVehicleStatus = (vehicle_id) => {
     })
 }
 
+const updatePushToken = (vehicle_id , pushToken) => {
+
+    return new Promise((success , fail) => {
+
+        vehicleModel.updatePushToken(vehicle_id , pushToken ,(err ,result) => {
+            if(err) {return fail(err)}
+
+            success({
+                success: true,
+                message: "update pushToken successfully"
+            })
+        })
+    })
+}
+
 module.exports={
     findAllVehicle,
     createVehicle,
     updateVehicle,
     findVehicleISNull,
     deleteVehicle,
-    updateVehicleStatus
+    updateVehicleStatus,
+    updatePushToken
 }

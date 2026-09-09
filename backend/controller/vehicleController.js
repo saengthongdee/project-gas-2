@@ -59,3 +59,15 @@ exports.updateVehicleStatus = asyncHandler(async(req , res ,next) => {
 
     res.status(200).json(result)
 })
+
+exports.updatePushToken = asyncHandler(async(req , res , next) => {
+
+    const { vehicle_id, push_token } = req.body;
+
+    if(!vehicle_id || !push_token) {return  next(new ApiError(400, "vehicle_id or push_token are required"))}
+
+    const result = await vehicleService.updatePushToken(vehicle_id , push_token)
+
+    res.status(200).json(result)
+
+})
