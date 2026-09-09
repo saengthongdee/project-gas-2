@@ -6,18 +6,19 @@ const {
   createVehicle,
   updateVehicle,
   deleteVehicle,
-  findVehicleISNull,
+  findVehicleIsNull,
   updateVehicleStatus,
   updatePushToken
 } = require("../controller/vehicleController");
 
-
 router.get("/", findAllVehicle);
 router.post("/", createVehicle);
+router.get("/null", findVehicleIsNull);
+
+router.put("/token", updatePushToken);
+router.put("/status/:id", updateVehicleStatus);
+
 router.put("/:id", updateVehicle);
 router.delete("/:id", deleteVehicle);
-router.get("/null", findVehicleISNull);
-router.put('/status/:id' , updateVehicleStatus)
-router.put('/token', updatePushToken);
 
 module.exports = router;
