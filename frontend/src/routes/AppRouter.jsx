@@ -15,6 +15,7 @@ import Cylinderdeposit from '../features/cylinderdeposit/page/Cylinderdeposit'
 import History from '../features/history/page/History'
 import FillingOrder from '../features/fillingOrder/page/fillingOrder'
 import Maintenance from '../features/maintenance/page/Maintenance'
+import Location from '../features/location/page/Location'
 
 const ProtectedRoute = ({ children, allowedRoles, redirectTo = "/" }) => {
     const { token, role } = useAuth()
@@ -128,6 +129,10 @@ const router = createBrowserRouter([
                         <Maintenance />
                     </ProtectedRoute>
                 )
+            },
+            {
+                path: '/Location',
+                element: <Location />
             }
         ]
     },
