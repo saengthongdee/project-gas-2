@@ -1,4 +1,4 @@
-# 🚀 API Summary - Authentication
+# API Summary - Authentication
 
 ---
 
@@ -28,7 +28,7 @@
 ---
 
 ### 2. Register Employee
-* **Endpoint:** `POST /api/auth/register-employee`
+* **Endpoint:** `POST /api/auth/register`
 * **รับ (Request Body):**
   ```json
   {
