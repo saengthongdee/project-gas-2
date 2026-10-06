@@ -26,22 +26,8 @@ const updateStorelocation = (latitude, longitude) => {
   });
 };
 
-const deleteStorelocation = () => {
-  
-  return new Promise((success, fail) => {
-    locationModel.deleteStoreLocation((err, result) => {
-      if (err) {return fail(err)}
-
-      success({
-        success:true,
-        data: result
-      })
-    });
-  });
-};
 
 module.exports ={
     findStorelocation,
     updateStorelocation,
-    deleteStorelocation
 }

@@ -21,9 +21,3 @@ exports.updateStorelocation = asyncHandler(async( req, res ,next) => {
 
     res.status(200).json(result)
 })
-
-exports.deleteStorelocation = asyncHandler(async( req, res ,next) => {
-    const result = await locationServier.deleteStorelocation()
-
-    res.status(200).json(result)
-})
