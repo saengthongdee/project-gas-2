@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const {findStorelocation} = require('../controller/locationControllers')
+const {findStorelocation , deleteStorelocation , updateStorelocation} = require('../controller/locationControllers')
 
 router.get('/', findStorelocation)
 router.put('/', updateStorelocation)
