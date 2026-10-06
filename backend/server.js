@@ -34,6 +34,7 @@ const fillingorderRouter = require('./routers/fillingorderRouter');
 const maintenenceRouter = require('./routers/maintenenceRouter');
 const historyOrderRouter = require('./routers/historyOrderRouter');
 const dashboardRouter = require('./routers/dashboardRouter');
+const locationRouter = require('./routers/locationRouter');
 
 app.use('/api/auth', authRouter);
 app.use('/api/customer', customerRouter);
@@ -48,6 +49,7 @@ app.use('/api/fillingorder', fillingorderRouter);
 app.use('/api/maintenence', maintenenceRouter);
 app.use('/api/historyOrder', historyOrderRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/location', locationRouter);
 
 app.use(notfound);
 app.use(errorHandler);
