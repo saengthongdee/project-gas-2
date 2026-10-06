@@ -14,14 +14,7 @@ const updateStoreLocation = (latitude , longitude , callback) =>{
     db.query(sql , [latitude , longitude] , callback)
 }
 
-const deleteStoreLocation = (callback) =>{
-
-    const sql = `delete from store_location where location_id = 1`
-    db.query(sql , callback)
-}
-
 module.exports = {
     findStoreLocation,
-    updateStoreLocation,
-    deleteStoreLocation
+    updateStoreLocation
 }
