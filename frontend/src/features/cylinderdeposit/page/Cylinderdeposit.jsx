@@ -28,7 +28,7 @@ export default function Cylinderdeposit() {
 
   // กรองข้อมูลตามคำค้นหาและสถานะ
   const filteredDeposits = useMemo(() => {
-    return deposits.filter((d) => {
+    const filtered = deposits.filter((d) => {
       const isCompleted = Number(d.qty_return) >= Number(d.qty_out)
       if (filterStatus === 'completed' && !isCompleted) return false
       if (filterStatus === 'pending' && isCompleted) return false
@@ -40,6 +40,12 @@ export default function Cylinderdeposit() {
         d.product_name?.toLowerCase().includes(term) ||
         String(d.deposit_id)?.includes(term)
       )
+    })
+
+    return filtered.sort((a, b) => {
+      const dateA = a.deposit_date ? new Date(a.deposit_date).getTime() : 0
+      const dateB = b.deposit_date ? new Date(b.deposit_date).getTime() : 0
+      return dateB - dateA // เอาค่าเวลาที่มากกว่า (ใหม่กว่า) ไว้ข้างหน้า
     })
   }, [deposits, searchTerm, filterStatus])
 
