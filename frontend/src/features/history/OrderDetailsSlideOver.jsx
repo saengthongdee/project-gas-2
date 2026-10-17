@@ -12,17 +12,21 @@ import {
 export default function OrderDetailsSlideOver({ isOpen, onClose, order }) {
   const safeOrder = order || {};
 
-  // กำหนด URL ของ Backend จาก Environment Variable
-  const BACKEND_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
-  // ฟังก์ชันแปลง Path ให้เป็น Full URL
-  const getFullImageUrl = (imagePath) => {
+  // ฟังก์ชันแปลง Path ให้เป็น Full URL (รองรับทั้ง imageUrl, proof_image และ image_url)
+  const getFullImageUrl = (orderData) => {
+    // เช็คชื่อฟิลด์ที่ backend อาจจะส่งมา
+    const imagePath = orderData.imageUrl || orderData.proof_image || orderData.image_url;
     if (!imagePath) return null;
     if (imagePath.startsWith("http")) return imagePath;
-    return `${BACKEND_URL}/${imagePath.replace(/^\//, "")}`;
+    
+    // จัดการ slash ให้ถูกต้อง ไม่ให้ซ้ำซ้อน
+    const formattedPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${BACKEND_URL}${formattedPath}`;
   };
 
-  const finalImageUrl = getFullImageUrl(safeOrder.imageUrl);
+  const finalImageUrl = getFullImageUrl(safeOrder);
 
   // 💡 ฟังก์ชันแปลงสถานะเป็นภาษาไทยและกำหนดสีป้ายสถานะ
   const getDeliveryStatusConfig = (status) => {
