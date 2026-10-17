@@ -106,7 +106,13 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
 
         res.status(200).json(result);
     } catch (error) {
-        return next(new ApiError(500, `ไม่สามารถอัปโหลดรูปภาพได้: ${error.message}`));
+        // พิมพ์ Error เต็มๆ ลงใน Console ของ Render เพื่อให้เราเห็นตัวจริง
+        console.error("Cloudinary Error Details:", error);
+        
+        // ดึงข้อความ error แบบปลอดภัย ป้องกันคำว่า undefined
+        const errorMsg = error?.message || error?.error?.message || JSON.stringify(error);
+        
+        return next(new ApiError(500, `ไม่สามารถอัปโหลดรูปภาพได้: ${errorMsg}`));
     }
 });
     
