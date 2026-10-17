@@ -89,7 +89,12 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const uploadResponse = await cloudinary.uploader.upload(imageBase64, {
+        // 1. ตัด Header เก่าออก (ถ้ามี) แล้วแปลงเป็น Data URI ที่ Cloudinary รองรับแน่นอน 100%
+        const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+        const dataUri = `data:image/jpeg;base64,${cleanBase64}`;
+
+        // 2. ส่ง Data URI ขึ้น Cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(dataUri, {
             folder: 'project-gas-proofs',
         });
 
@@ -106,12 +111,8 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
 
         res.status(200).json(result);
     } catch (error) {
-        // พิมพ์ Error เต็มๆ ลงใน Console ของ Render เพื่อให้เราเห็นตัวจริง
         console.error("Cloudinary Error Details:", error);
-        
-        // ดึงข้อความ error แบบปลอดภัย ป้องกันคำว่า undefined
         const errorMsg = error?.message || error?.error?.message || JSON.stringify(error);
-        
         return next(new ApiError(500, `ไม่สามารถอัปโหลดรูปภาพได้: ${errorMsg}`));
     }
 });
