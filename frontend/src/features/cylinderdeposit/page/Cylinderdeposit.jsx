@@ -233,7 +233,6 @@ export default function Cylinderdeposit() {
         )}
       </div>
 
-      {/* เรียกใช้งานคอมโพเนนต์ Slide-over ที่แยกออกมา */}
       <CylinderdepositSlideOver
         isOpen={isEditing}
         onClose={() => setIsEditing(false)}
