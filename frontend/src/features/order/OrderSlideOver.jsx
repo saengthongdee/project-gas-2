@@ -7,6 +7,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData, o
   const { data: customers = [] } = useCustomer();
   const { data: products = [] } = useProduct();
 
+  // State สำหรับเก็บข้อมูลฟอร์ม
   const [formData, setFormData] = useState({
     customer_id: "",
     items: [{ product_id: "", quantity: 1, unit_price: 0 }],
@@ -21,7 +22,6 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData, o
 const filteredCustomers = useMemo(() => {
     const search = (formData.customer_id || "").toLowerCase().trim();
     
-    // ถ้ายังไม่ได้พิมพ์ หรือพิมพ์น้อยกว่า 1 ตัวอักษร จะไม่แสดงรายการขึ้นมา
     if (search.length < 1) return []; 
 
     return customers.filter((c) => {
@@ -31,7 +31,9 @@ const filteredCustomers = useMemo(() => {
     });
   }, [customers, formData.customer_id]);
 
+
   const totalAmount = useMemo(() => {
+
     return formData.items.reduce((sum, item) => {
       return sum + (Number(item.unit_price) || 0) * (Number(item.quantity) || 0);
     }, 0);
@@ -41,7 +43,6 @@ const filteredCustomers = useMemo(() => {
     if (!isOpen) return;
 
     if (initialData) {
-      // หาชื่อลูกค้าจาก initialData เพื่อนำมาแสดงผลในช่องกรอก
       const matchedCustomer = customers.find(
         (c) =>
           Number(c.customer_id) === Number(initialData.customer_id) ||
@@ -346,7 +347,7 @@ const filteredCustomers = useMemo(() => {
           <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-50 flex flex-col items-center justify-between gap-3 shrink-0">
             <div className="w-full p-3.5 bg-blue-50/50 border border-blue-100 rounded-lg flex items-center justify-between">
               <span className="text-sm font-medium text-neutral-700">
-                ยอดรวมทั้งหมด (total_amount):
+                ยอดรวมทั้งหมด :
               </span>
               <span className="text-lg font-bold text-blue-600">
                 {totalAmount.toLocaleString("th-TH", {

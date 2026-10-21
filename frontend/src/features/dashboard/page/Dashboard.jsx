@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const handleOrderUpdate = (payload) => {
-      console.log("⚡ ได้รับสัญญาณอัปเดตจาก Socket:", payload);
+      console.log("ได้รับสัญญาณอัปเดตจาก Socket:", payload);
       
       fetchDashboard1().then((resData) => {
         const data = resData?.data || resData;

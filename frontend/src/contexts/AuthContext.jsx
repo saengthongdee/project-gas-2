@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
 
     const [employeeName, setEmployeeName] = useState(() => {
         const savedName = localStorage.getItem('gas-employee_name')
-        // เช็คว่ามีค่า และไม่ใช่ string ว่าง หรือคำว่า "null" / "undefined"
+
         return savedName && savedName !== 'null' && savedName !== 'undefined' ? savedName : null
     })
 
