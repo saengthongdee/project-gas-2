@@ -81,15 +81,17 @@ exports.findOneOrder = asyncHandler(async (req, res, next) => {
 });
 
 exports.uploadImage = asyncHandler(async (req, res, next) => {
+
     const { order_id } = req.params;
+    const { payment_method } = req.body;
     const { imageBase64 } = req.body;
 
-    if (!order_id || !imageBase64) {
+    if (!order_id || !imageBase64 || !payment_method) {
         return next(new ApiError(400, "order_id and imageBase64 are required"));
     }
 
     try {
-        // 1. ตัด Header เก่าออก (ถ้ามี) แล้วแปลงเป็น Data URI ที่ Cloudinary รองรับแน่นอน 100%
+
         const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
         const dataUri = `data:image/jpeg;base64,${cleanBase64}`;
 
@@ -99,7 +101,7 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
         });
 
         const imagePath = uploadResponse.secure_url;
-        const result = await orderService.uploadImage(order_id, imagePath);
+        const result = await orderService.uploadImage(order_id, imagePath , payment_method);
 
         const io = req.app.get('io');
         if (io) {
