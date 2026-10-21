@@ -80,6 +80,8 @@ exports.findOneOrder = asyncHandler(async (req, res, next) => {
     res.status(200).json(result);
 });
 
+
+// ---------------------------------------------------------------------------
 exports.uploadImage = asyncHandler(async (req, res, next) => {
 
     const { order_id } = req.params;

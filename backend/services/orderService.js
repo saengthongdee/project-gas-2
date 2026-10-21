@@ -259,7 +259,7 @@ const findOneOrder = async(order_id) => {
         })
     })
 }
-
+// /---------------------------------------------------------------------------
 const uploadImage = async(order_id , imagePath , payment_method) => {
 
     return new Promise((success , fail) => {

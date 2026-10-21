@@ -1,8 +1,6 @@
 const mysql = require("mysql2");
 
-
 const db = mysql.createPool({
-
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     user: process.env.DB_USER,
@@ -13,14 +11,15 @@ const db = mysql.createPool({
     },
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    timezone: '+07:00'
 });
 
 db.getConnection((err, connection) => {
     if (err) {
         console.error('Error connecting to the database: ', err);
     } else {
-        console.log('Connected to the database successfully via Connection Pool!');
+        console.log('Connected to the database successfully via Connection Pool (Timezone: +07:00)!');
         connection.release();
     }
 });
