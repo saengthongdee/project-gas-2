@@ -15,6 +15,10 @@ const db = mysql.createPool({
     timezone: '+07:00'
 });
 
+db.on('connection', (connection) => {
+    connection.query('SET time_zone = "+07:00"');
+});
+
 db.getConnection((err, connection) => {
     if (err) {
         console.error('Error connecting to the database: ', err);
