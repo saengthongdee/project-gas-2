@@ -282,13 +282,15 @@ const uploadImage = async(order_id , imagePath , payment_method) => {
     })
 }
 
-const cancelOrder = async(order_id) => {
+const cancelOrder = async (order_id) => {
+    return new Promise((success, fail) => {
+        
+        orderModel.cancelOrder(order_id, (err, results) => {
+            if (err) return fail(err);
 
-    return new Promise((success , fail) => {
+            returnStock(order_id, (err, restockResult) => {
 
-        orderModel.cancelOrder(order_id , (err , results) =>{
-
-            if(err) {return fail(err)}
+                if (err) return fail(err);
 
                 cylinderDepositModel.deleteCylinderdeposit(order_id , (err , result) => {
 
@@ -325,9 +327,10 @@ const cancelOrder = async(order_id) => {
                         })
                     })
                 })
-        })
-    })
-}
+            });
+        });
+    });
+};
 
 module.exports={
     createOrder,
@@ -340,3 +343,5 @@ module.exports={
     uploadImage,
     cancelOrder
 }
+
+

@@ -122,6 +122,7 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
 });
     
 exports.cancelOrder = asyncHandler(async (req, res, next) => {
+    
     const order_id = req.params.id;
 
     if(!order_id) { return next(new ApiError(400, "order_id is required")); }
