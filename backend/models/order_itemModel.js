@@ -62,6 +62,8 @@ const findOneOrder_Item = (order_id , callback) => {
 
     db.query(sql , order_id ,callback)
 }
+
+// ----
 const returnStock = (order_id, callback) => {
     // 1. แก้ SQL ให้ถูกต้อง (เลือก product_id และ quantity)
     const findSql = `

@@ -14,9 +14,6 @@ import {
   UserCheck,
   PackageCheck,
   Pencil,
-  Clock,
-  Truck,
-  CheckCircle2,
   XCircle
 } from "lucide-react";
 
@@ -31,7 +28,7 @@ export default function Order() {
   // State สำหรับ Search & Filter
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSaveOrder = async (payload) => {
+const handleSaveOrder = async (payload) => {
     console.log("Payload to save:", payload);
 
     try {
@@ -48,12 +45,10 @@ export default function Order() {
                         .map((i) => `#${i.product_id} (ขอ ${i.requested}, เหลือ ${i.available})`)
                         .join(", ");
                     toast.error(`สินค้าไม่พอ: ${names}`);
-
-                    await refetch();
                 } else {
                     toast.error(result.message || "สร้างออเดอร์ไม่สำเร็จ");
-                    await refetch();
                 }
+                await refetch();
                 return;
             }
 
