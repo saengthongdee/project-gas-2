@@ -63,9 +63,9 @@ const findOneOrder_Item = (order_id , callback) => {
     db.query(sql , order_id ,callback)
 }
 const returnStock = (order_id, callback) => {
-    // 1. ดึง item_id และ quantity จาก order_items
+    // 1. แก้ SQL ให้ถูกต้อง (เลือก product_id และ quantity)
     const findSql = `
-        select item_id, quantity from order_items where order_id = ?;
+        select product_id, quantity from order_items where order_id = ?;
     `;
     
     db.query(findSql, [order_id], (err, items) => {
@@ -80,14 +80,14 @@ const returnStock = (order_id, callback) => {
 
         // 2. วนลูปคืนสต็อกสินค้าทีละรายการ
         items.forEach((item) => {
-            // ปรับชื่อตารางและคอลัมน์ให้ตรงกับรูป: products, stock_qty, product_id
             const updateStockSql = `
                 update products 
                 set stock_qty = stock_qty + ? 
                 where product_id = ?;
             `;
             
-            db.query(updateStockSql, [item.quantity, item.item_id], (err) => {
+            // 3. เปลี่ยนจาก item.item_id เป็น item.product_id ให้ตรงกัน
+            db.query(updateStockSql, [item.quantity, item.product_id], (err) => {
                 if (hasError) return;
                 
                 if (err) {
@@ -97,7 +97,7 @@ const returnStock = (order_id, callback) => {
 
                 completed++;
 
-                // 3. ถ้าวนครบทุกตัวแล้ว แจ้งว่าสำเร็จ
+                // 4. ถ้าวนครบทุกตัวแล้ว แจ้งว่าสำเร็จ
                 if (completed === items.length) {
                     callback(null, { message: 'Return stock success' });
                 }

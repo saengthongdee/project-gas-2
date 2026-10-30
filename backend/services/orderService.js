@@ -286,6 +286,7 @@ const cancelOrder = async (order_id) => {
     return new Promise((success, fail) => {
         
         orderModel.cancelOrder(order_id, (err, results) => {
+            
             if (err) return fail(err);
 
             items_order.returnStock(order_id, (err, restockResult) => {
