@@ -22,9 +22,22 @@ const deleteCustomer =async(customer_id,callback)=>{
     db.query(sql,[customer_id],callback);
 }
 
+const findCustomerID = (customer_id , callback) => {
+
+    const sql = 
+    `
+    SELECT order_id FROM orders WHERE delivery_status IN ('delivering','pending') 
+	    AND order_date >= CURDATE() 
+		    AND order_date < CURDATE() + INTERVAL 1 DAY
+			    and customer_id = ?
+    `
+    db.query(sql , [customer_id] , callback)
+}
+
 module.exports ={
     findAllCustomer,
     createCustomer,
     updateCustomer,
-    deleteCustomer
+    deleteCustomer,
+    findCustomerID
 }

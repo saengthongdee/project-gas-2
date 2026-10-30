@@ -48,7 +48,6 @@ const findOneEmployee_name = (vehicle_id , callback) => {
 
     db.query(sql , vehicle_id , callback)
 }
-
 module.exports={
     findAllEmployee,
     createEmployee,
