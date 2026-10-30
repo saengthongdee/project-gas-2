@@ -32,6 +32,8 @@ export const useOrder = () => {
       setLoading(true);
       setError(null);
 
+      console.log("Creating order with data:", orderData); // Debug log
+
       const response = await axiosInstance.post("/order", orderData);
 
       if (response.data.success) {
