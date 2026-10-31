@@ -19,7 +19,7 @@ export default function OrderSlideOver({ isOpen, onClose, onSave, initialData, o
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
   // กรองรายชื่อลูกค้าตามคำค้นหาในช่อง input
-const filteredCustomers = useMemo(() => {
+  const filteredCustomers = useMemo(() => {
     const search = (formData.customer_id || "").toLowerCase().trim();
     
     if (search.length < 1) return []; 
@@ -31,13 +31,18 @@ const filteredCustomers = useMemo(() => {
     });
   }, [customers, formData.customer_id]);
 
-
   const totalAmount = useMemo(() => {
-
     return formData.items.reduce((sum, item) => {
       return sum + (Number(item.unit_price) || 0) * (Number(item.quantity) || 0);
     }, 0);
   }, [formData.items]);
+
+  // ฟังก์ชันเช็กว่า product_id นี้ถูกเลือกไปแล้วในแถวอื่นหรือไม่
+  const isProductSelected = (productId, currentIndex) => {
+    return formData.items.some(
+      (item, idx) => idx !== currentIndex && Number(item.product_id) === Number(productId)
+    );
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -117,6 +122,11 @@ const filteredCustomers = useMemo(() => {
   };
 
   const addItemRow = () => {
+    if (formData.items.length >= products.length) {
+      alert("คุณได้เลือกสินค้าครบทุกรายการที่มีในระบบแล้ว");
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       items: [...prev.items, { product_id: "", quantity: 1, unit_price: 0 }],
@@ -138,7 +148,6 @@ const filteredCustomers = useMemo(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ค้นหา customer_id จากชื่อที่ผู้ใช้พิมพ์เข้ามา หรือใช้ค่าเดิมหากเป็นตัวเลข
     const matchedCustomer = customers.find(
       (c) =>
         String(c.customer_id) === String(formData.customer_id) ||
@@ -241,7 +250,7 @@ const filteredCustomers = useMemo(() => {
                     return (
                       <div
                         key={c.customer_id}
-                        onMouseDown={(e) => e.preventDefault()} // ป้องกันไม่ให้ onBlur ปิดกล่องก่อนกดเลือก
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                           setFormData((prev) => ({ ...prev, customer_id: customerName }));
                           setShowCustomerDropdown(false);
@@ -289,11 +298,19 @@ const filteredCustomers = useMemo(() => {
                           className="w-full px-3.5 py-2 text-sm bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] text-[#1A1A1A] cursor-pointer"
                         >
                           <option value="">-- เลือกสินค้า --</option>
-                          {products.map((p) => (
-                            <option key={p.product_id} value={p.product_id}>
-                              {p.product_name} ({p.current_price || 0} บาท)
-                            </option>
-                          ))}
+                          {products.map((p) => {
+                            const isAlreadySelected = isProductSelected(p.product_id, index);
+                            return (
+                              <option
+                                key={p.product_id}
+                                value={p.product_id}
+                                disabled={isAlreadySelected}
+                                className={isAlreadySelected ? "text-gray-300 bg-gray-100" : ""}
+                              >
+                                {p.product_name} ({p.current_price || 0} บาท) {isAlreadySelected ? "- (เลือกแล้ว)" : ""}
+                              </option>
+                            );
+                          })}
                         </select>
                       </div>
                       {formData.items.length > 1 && (

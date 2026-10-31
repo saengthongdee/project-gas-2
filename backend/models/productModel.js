@@ -94,7 +94,6 @@ const updateStock = (items, callback) => {
                 return callback(error);
             }
 
-            // ถ้า affectedRows เป็น 0 แปลว่าสต็อกไม่พอ (WHERE stock_qty >= ? ไม่ผ่าน)
             if (results.affectedRows === 0) {
                 hasError = true;
                 return callback(new Error(`สินค้า ID ${item.product_id} สต็อกไม่เพียงพอ`));
